@@ -111,9 +111,11 @@ CREATE TABLE batches (
     course_id INT UNSIGNED NULL,
     batch_number INT,
     batch_code VARCHAR(50),
+    session_label VARCHAR(20),          -- e.g. "2025/2026"
     start_date DATE,
     end_date DATE,
     is_active TINYINT(1) DEFAULT 1,
+    application_open TINYINT(1) DEFAULT 1,  -- 1 = accepting applications, 0 = closed
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_batch_course

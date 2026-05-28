@@ -152,6 +152,7 @@
                                         <th>Application Fee</th>
                                         <th>Registration Fee</th>
                                         <th>Status</th>
+                                        <th>Batch / Applications</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -274,12 +275,12 @@
 
             <!-- ID/Certificate Generator -->
             <div id="generate-tab" class="tab-content">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">ID/Certificate Generator</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">ID / Certificate / Transcript Generator</h2>
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-4 mb-4">
                         <div class="card shadow">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-gray-800">Generate ID Card</h6>
+                                <h6 class="m-0 font-weight-bold text-gray-800"><i class="fas fa-id-card me-2 text-primary"></i>Generate ID Card</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -295,21 +296,37 @@
                                         <input type="text" id="id-card-entity-id" placeholder="e.g., 101" class="form-control">
                                     </div>
                                 </div>
-                                <button id="generate-id-card-button" class="btn btn-success">Generate ID Card</button>
+                                <button id="generate-id-card-button" class="btn btn-success w-100"><i class="fas fa-id-card me-1"></i>Generate ID Card</button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-4 mb-4">
                         <div class="card shadow">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-gray-800">Generate Certificate</h6>
+                                <h6 class="m-0 font-weight-bold text-gray-800"><i class="fas fa-certificate me-2 text-warning"></i>Generate Certificate</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="certificate-student-id" class="form-label">Student ID</label>
                                     <input type="text" id="certificate-student-id" placeholder="e.g., 205" class="form-control">
                                 </div>
-                                <button id="generate-certificate-button" class="btn btn-success">Generate Certificate</button>
+                                <p class="text-muted small">Student must have graduation approved and graduation fee paid.</p>
+                                <button id="generate-certificate-button" class="btn btn-success w-100"><i class="fas fa-certificate me-1"></i>Generate Certificate</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-gray-800"><i class="fas fa-scroll me-2 text-info"></i>Generate Transcript</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="transcript-student-id" class="form-label">Student ID</label>
+                                    <input type="text" id="transcript-student-id" placeholder="e.g., 205" class="form-control">
+                                </div>
+                                <p class="text-muted small">Student must have graduation fee paid. Includes all assignment scores and final project.</p>
+                                <button id="generate-transcript-button" class="btn btn-info w-100 text-white"><i class="fas fa-scroll me-1"></i>Generate Transcript</button>
                             </div>
                         </div>
                     </div>

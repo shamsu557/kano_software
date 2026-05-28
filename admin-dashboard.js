@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const addResourceButton = document.getElementById('add-resource-button');
   const generateIdCardButton = document.getElementById('generate-id-card-button');
   const generateCertificateButton = document.getElementById('generate-certificate-button');
+  const generateTranscriptButton = document.getElementById('generate-transcript-button');
   const logoutButton = document.getElementById('logout-button');
   const modal = document.getElementById('modal');
   const modalTitle = document.getElementById('modal-title');
@@ -131,6 +132,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     coursesTable.querySelector('tbody').innerHTML = '';
     courses.forEach(course => {
       const row = document.createElement('tr');
+
+      // Batch + application status cell — only meaningful for active courses
+      let batchCell = '<span class="text-gray-400 text-xs">—</span>';
+      let appToggleBtn = '';
+      if (course.is_active) {
+        if (course.current_batch_id) {
+          const batchLabel = course.current_session_label
+            ? `Batch ${course.current_batch_number} &bull; ${course.current_session_label}`
+            : `Batch ${course.current_batch_number}`;
+          const appOpen = parseInt(course.application_open) === 1;
+          const badgeClass = appOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+          const badgeText = appOpen ? 'Open' : 'Closed';
+          batchCell = `<div class="text-xs font-medium text-gray-700">${batchLabel}</div>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${badgeClass}">${badgeText}</span>`;
+          appToggleBtn = `<button class="btn btn-sm toggle-application-btn ${appOpen ? 'btn-outline-warning' : 'btn-outline-success'}"
+            data-batch-id="${course.current_batch_id}"
+            data-course-id="${course.id}"
+            data-open="${appOpen ? 1 : 0}"
+            title="${appOpen ? 'Close Applications' : 'Open Applications'}">
+            <i class="bi ${appOpen ? 'bi-lock' : 'bi-unlock'}"></i>
+            <span class="ms-1 d-none d-lg-inline">${appOpen ? 'Close' : 'Open'} Apps</span>
+          </button>`;
+        } else {
+          batchCell = '<span class="text-xs text-orange-500 font-medium">No active batch</span>';
+          appToggleBtn = '';
+        }
+      }
+
       row.innerHTML = `
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${course.name || 'N/A'}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${course.duration || 'N/A'}</td>
@@ -138,7 +167,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">${formatCurrency(course.application_fee || 0)}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">${formatCurrency(course.registration_fee || 0)}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusBadge(course.is_active)}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+        <td class="px-6 py-4 whitespace-nowrap text-sm">${batchCell}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-1">
+          ${appToggleBtn}
+          <button class="btn btn-sm btn-outline-secondary manage-batch-btn"
+            data-course-id="${course.id}"
+            data-course-name="${course.name}"
+            data-current-batch="${course.current_batch_number || 0}"
+            title="Manage Batch">
+            <i class="bi bi-layers"></i>
+            <span class="ms-1 d-none d-lg-inline">Batch</span>
+          </button>
           <button class="btn btn-sm btn-outline-primary edit-button" data-id="${course.id}" data-type="course">
             <i class="bi bi-pencil-square"></i>
           </button>
@@ -148,6 +187,88 @@ document.addEventListener('DOMContentLoaded', async () => {
         </td>
       `;
       coursesTable.querySelector('tbody').appendChild(row);
+    });
+
+    // Wire up toggle-application buttons
+    coursesTable.querySelectorAll('.toggle-application-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const batchId = btn.dataset.batchId;
+        const isOpen = parseInt(btn.dataset.open);
+        const action = isOpen ? 'close' : 'open';
+        if (!confirm(`Are you sure you want to ${action} applications for this batch?`)) return;
+        try {
+          const res = await fetch(`/api/admin/batches/${batchId}/toggle-application`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await res.json();
+          if (data.success) {
+            await fetchDataAndRender('/api/admin/courses', renderCourses);
+          } else {
+            alert(data.error || 'Failed to toggle application status');
+          }
+        } catch (err) {
+          alert('Network error. Please try again.');
+        }
+      });
+    });
+
+    // Wire up manage-batch buttons
+    coursesTable.querySelectorAll('.manage-batch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const courseId   = btn.dataset.courseId;
+        const courseName = btn.dataset.courseName;
+        const lastBatch  = parseInt(btn.dataset.currentBatch) || 0;
+        const nextBatch  = lastBatch + 1;
+
+        const formHtml = `
+          <div class="alert alert-info py-2 px-3 small mb-3">
+            Creating a new batch opens applications for <strong>${courseName}</strong>.
+            The previous batch is closed automatically and the new batch becomes active.
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-gray-700 font-medium">Batch Number</label>
+            <input type="number" name="batchNumber" class="form-control" value="${nextBatch}" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-gray-700 font-medium">Session Label <span class="text-muted small">(e.g. 2025/2026)</span></label>
+            <input type="text" name="sessionLabel" class="form-control" placeholder="e.g. 2025/2026">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-gray-700 font-medium">Start Date</label>
+            <input type="date" name="startDate" class="form-control">
+          </div>
+        `;
+
+        showModal(`New Batch — ${courseName}`, formHtml, async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const payload = {
+            courseId,
+            batchNumber: fd.get('batchNumber'),
+            sessionLabel: fd.get('sessionLabel') || '',
+            startDate: fd.get('startDate') || ''
+          };
+          try {
+            const res = await fetch('/api/admin/batches', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`Batch created: ${data.batchCode}\nApplications are now OPEN.`);
+              await fetchDataAndRender('/api/admin/courses', renderCourses);
+            } else {
+              alert(data.error || 'Failed to create batch');
+            }
+          } catch (err) {
+            alert('Network error. Please try again.');
+          }
+        });
+      });
     });
   };
 
@@ -265,9 +386,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderDashboardOverview = async () => {
     const data = await fetchData('/api/admin/overview');
     if (data.success) {
-      staffCountEl.textContent = data.tutors || 0;
+      staffCountEl.textContent   = data.staff    || 0;
       studentCountEl.textContent = data.students || 0;
-      courseCountEl.textContent = data.total || data.active || 0;
+      courseCountEl.textContent  = data.courses  || 0;
     } else {
       console.error('Failed to fetch dashboard data:', data.error);
       alert('Failed to load dashboard data. Please try again.');
@@ -1131,6 +1252,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       const data = await response.json();
       alert(data.error || 'Failed to generate certificate.');
+    }
+  });
+
+  generateTranscriptButton.addEventListener('click', async () => {
+    const studentId = document.getElementById('transcript-student-id').value.trim();
+    if (!studentId) {
+      alert('Please enter a Student ID.');
+      return;
+    }
+    const response = await fetch(`${API_BASE_URL}/api/admin/transcript/${studentId}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Transcript_${studentId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      alert('Transcript generated successfully.');
+    } else {
+      let errMsg = 'Failed to generate transcript.';
+      try { const d = await response.json(); errMsg = d.error || errMsg; } catch {}
+      alert(errMsg);
     }
   });
 

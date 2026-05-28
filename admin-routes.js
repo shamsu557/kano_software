@@ -50,13 +50,13 @@ router.get('/overview', isAdmin, (req, res) => {
   const queries = [
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE status NOT IN ("Applied")', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM staff WHERE is_registered=1', (e, rows) => r(rows[0]?.c || 0))),
-    new Promise(r => db.query('SELECT SUM(amount) as t FROM payments WHERE status="Completed"', (e, rows) => r(rows[0]?.t || 0))),
+    new Promise(r => db.query('SELECT COUNT(*) as c FROM courses', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE graduation_status="Passed" AND graduation_approved_by IS NULL', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE graduation_status="Failed" AND status != "Active"', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE status="Active"', (e, rows) => r(rows[0]?.c || 0))),
   ];
-  Promise.all(queries).then(([students, tutors, revenue, pendingGrad, failed, active]) => {
-    res.json({ success: true, students, tutors, revenue, pendingGrad, failed, active });
+  Promise.all(queries).then(([students, staff, courses, pendingGrad, failed, activeStudents]) => {
+    res.json({ success: true, students, staff, courses, pendingGrad, failed, activeStudents });
   });
 });
 
@@ -64,22 +64,32 @@ router.get('/overview', isAdmin, (req, res) => {
 router.get('/courses', isAdmin, (req, res) => {
   db.query(
     `SELECT 
-      id,
-      name,
-      abbreviation,
-      description,
-      duration,
-      mode,
-      schedule,
-      application_fee,
-      registration_fee,
-      certification_type,
-      is_active,
-      image_path,
-      roadmap,
-      created_at
-    FROM courses 
-    ORDER BY is_active DESC, name`,
+      c.id,
+      c.name,
+      c.abbreviation,
+      c.description,
+      c.duration,
+      c.mode,
+      c.schedule,
+      c.application_fee,
+      c.registration_fee,
+      c.certification_type,
+      c.is_active,
+      c.image_path,
+      c.roadmap,
+      c.created_at,
+      b.id           AS current_batch_id,
+      b.batch_number AS current_batch_number,
+      b.batch_code   AS current_batch_code,
+      b.session_label AS current_session_label,
+      b.application_open
+    FROM courses c
+    LEFT JOIN batches b ON b.id = (
+      SELECT id FROM batches
+      WHERE course_id = c.id AND is_active = 1
+      ORDER BY created_at DESC LIMIT 1
+    )
+    ORDER BY c.is_active DESC, c.name`,
     (err, rows) => {
       if (err) {
         console.error(err);
@@ -220,13 +230,30 @@ router.get('/batches', isAdmin, (req, res) => {
 });
 
 router.post('/batches', isAdmin, (req, res) => {
-  const { courseId, batchNumber, startDate } = req.body;
+  const { courseId, batchNumber, startDate, sessionLabel } = req.body;
   db.query('SELECT abbreviation FROM courses WHERE id=?', [courseId], (err, rows) => {
     if (err || !rows.length) return res.status(400).json({ error: 'Invalid course' });
     const code = `${rows[0].abbreviation}-BATCH-${String(batchNumber).padStart(3, '0')}`;
-    db.query('INSERT INTO batches (course_id, batch_number, batch_code, start_date, is_active) VALUES (?,?,?,?,1)', [courseId, batchNumber, code, startDate], (e2, r) => {
+    db.query(
+      'INSERT INTO batches (course_id, batch_number, batch_code, session_label, start_date, is_active, application_open) VALUES (?,?,?,?,?,1,1)',
+      [courseId, batchNumber, code, sessionLabel || null, startDate],
+      (e2, r) => {
+        if (e2) return res.status(500).json({ error: 'DB error' });
+        res.json({ success: true, batchCode: code, id: r.insertId });
+      }
+    );
+  });
+});
+
+// Toggle application open/closed for a batch
+router.patch('/batches/:id/toggle-application', isAdmin, (req, res) => {
+  const { id } = req.params;
+  db.query('SELECT application_open FROM batches WHERE id=?', [id], (err, rows) => {
+    if (err || !rows.length) return res.status(404).json({ error: 'Batch not found' });
+    const newVal = rows[0].application_open ? 0 : 1;
+    db.query('UPDATE batches SET application_open=? WHERE id=?', [newVal, id], (e2) => {
       if (e2) return res.status(500).json({ error: 'DB error' });
-      res.json({ success: true, batchCode: code, id: r.insertId });
+      res.json({ success: true, application_open: newVal });
     });
   });
 });

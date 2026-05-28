@@ -836,10 +836,15 @@ function buildCourseCard(c) {
     ? `<img src="${c.image_path}" alt="${escHtml(c.name)}" loading="lazy">`
     : `<div class="no-img-icon"><i class="fas fa-laptop-code"></i></div>`;
 
-  /* status badge — active = currently enrolling, inactive = coming soon */
-  const statusBadge = c.is_active
-    ? `<span class="badge-active"><i class="fas fa-circle" style="font-size:.45rem;vertical-align:middle;margin-right:4px;"></i>Active</span>`
-    : `<span class="badge-soon"><i class="fas fa-clock" style="font-size:.6rem;margin-right:4px;"></i>Coming Soon</span>`;
+  /* Three states: inactive (coming soon) | active+closed | active+open */
+  const appOpen = parseInt(c.application_open) === 1;
+
+  /* status badge */
+  const statusBadge = !c.is_active
+    ? `<span class="badge-soon"><i class="fas fa-clock" style="font-size:.6rem;margin-right:4px;"></i>Coming Soon</span>`
+    : appOpen
+      ? `<span class="badge-active"><i class="fas fa-circle" style="font-size:.45rem;vertical-align:middle;margin-right:4px;"></i>Active</span>`
+      : `<span class="badge-closed" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:600;"><i class="fas fa-lock" style="font-size:.6rem;margin-right:4px;"></i>Applications Closed</span>`;
 
   const certBadge = `<span class="badge-cert">${escHtml(c.certification_type || 'Certificate')}</span>`;
 
@@ -854,9 +859,11 @@ function buildCourseCard(c) {
   const metaTags    = [durationTag, modeTag, scheduleTag].filter(Boolean).join('');
 
   /* enrolment status line */
-  const startLine = c.is_active
-    ? `<div class="course-start"><span class="dot-active"></span> Currently enrolling</div>`
-    : `<div class="course-start"><span class="dot-soon"></span> Enrolment opening soon</div>`;
+  const startLine = !c.is_active
+    ? `<div class="course-start"><span class="dot-soon"></span> Enrolment opening soon</div>`
+    : appOpen
+      ? `<div class="course-start"><span class="dot-active"></span> Currently enrolling</div>`
+      : `<div class="course-start" style="color:#856404;"><i class="fas fa-lock" style="font-size:.65rem;margin-right:5px;"></i> Applications closed — check back later</div>`;
 
   /* fee pills — always show both fees if present */
   const appFee = Number(c.application_fee || 0);
@@ -869,7 +876,7 @@ function buildCourseCard(c) {
 
   /* roadmap button — passes course id and isActive flag */
   const roadmapBtn = c.roadmap
-    ? `<button class="btn btn-outline-primary btn-sm" onclick='showRoadmap(${JSON.stringify(c.roadmap)}, ${JSON.stringify(c.name)}, ${c.id}, ${c.is_active ? 1 : 0})'>
+    ? `<button class="btn btn-outline-primary btn-sm" onclick='showRoadmap(${JSON.stringify(c.roadmap)}, ${JSON.stringify(c.name)}, ${c.id}, ${(c.is_active && appOpen) ? 1 : 0})'>
          <i class="fas fa-road me-1"></i>Roadmap
        </button>`
     : '';
@@ -877,20 +884,36 @@ function buildCourseCard(c) {
   /* apply URL is course-specific */
   const applyUrl = `/student/apply?courseId=${c.id}`;
 
-  /* footer — price + actions. Roadmap always shown; Apply only for active */
-  const footer = c.is_active
-    ? `<div class="course-footer">
-         ${feePills}
-         <div class="course-actions" style="margin-left:auto;">
-           ${roadmapBtn}
-           <a href="${applyUrl}" class="btn btn-primary btn-sm"><i class="fas fa-pen me-1"></i>Apply Now</a>
-         </div>
-       </div>`
-    : `<div class="course-footer">
-         ${feePills}
-         <div class="text-muted small mt-1"><i class="fas fa-bell me-1"></i>Check back for enrollment dates</div>
-         <div class="course-actions" style="margin-left:auto;">${roadmapBtn}</div>
-       </div>`;
+  /* footer — three states */
+  let footer;
+  if (!c.is_active) {
+    /* Inactive — coming soon, no apply */
+    footer = `<div class="course-footer">
+      ${feePills}
+      <div class="text-muted small mt-1"><i class="fas fa-bell me-1"></i>Check back for enrollment dates</div>
+      <div class="course-actions" style="margin-left:auto;">${roadmapBtn}</div>
+    </div>`;
+  } else if (!appOpen) {
+    /* Active but applications closed for current batch */
+    footer = `<div class="course-footer">
+      ${feePills}
+      <div class="course-actions" style="margin-left:auto;">
+        ${roadmapBtn}
+        <span class="btn btn-sm btn-warning disabled" style="opacity:.75;cursor:default;">
+          <i class="fas fa-lock me-1"></i>Applications Closed
+        </span>
+      </div>
+    </div>`;
+  } else {
+    /* Active + open — show Apply Now */
+    footer = `<div class="course-footer">
+      ${feePills}
+      <div class="course-actions" style="margin-left:auto;">
+        ${roadmapBtn}
+        <a href="${applyUrl}" class="btn btn-primary btn-sm"><i class="fas fa-pen me-1"></i>Apply Now</a>
+      </div>
+    </div>`;
+  }
 
   return `
     <div class="col-md-6 col-lg-4">

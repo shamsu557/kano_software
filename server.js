@@ -231,21 +231,31 @@ app.get('/api/courses', (req, res) => {
 
   const query = `
     SELECT
-      id,
-      name,
-      abbreviation,
-      description,
-      duration,
-      mode,
-      schedule,
-      application_fee,
-      registration_fee,
-      certification_type,
-      is_active,
-      image_path,
-      roadmap
-    FROM courses
-    ORDER BY is_active DESC, name
+      c.id,
+      c.name,
+      c.abbreviation,
+      c.description,
+      c.duration,
+      c.mode,
+      c.schedule,
+      c.application_fee,
+      c.registration_fee,
+      c.certification_type,
+      c.is_active,
+      c.image_path,
+      c.roadmap,
+      b.id           AS current_batch_id,
+      b.batch_number AS current_batch_number,
+      b.batch_code   AS current_batch_code,
+      b.session_label AS current_session_label,
+      COALESCE(b.application_open, 0) AS application_open
+    FROM courses c
+    LEFT JOIN batches b ON b.id = (
+      SELECT id FROM batches
+      WHERE course_id = c.id AND is_active = 1
+      ORDER BY created_at DESC LIMIT 1
+    )
+    ORDER BY c.is_active DESC, c.name
   `;
 
   db.query(query, (err, rows) => {
@@ -388,7 +398,12 @@ app.post(
     }
 
     db.query(
-      'SELECT id FROM courses WHERE id = ? AND is_active = 1',
+      `SELECT c.id FROM courses c
+       LEFT JOIN batches b ON b.id = (
+         SELECT id FROM batches WHERE course_id = c.id AND is_active = 1
+         ORDER BY created_at DESC LIMIT 1
+       )
+       WHERE c.id = ? AND c.is_active = 1 AND COALESCE(b.application_open, 0) = 1`,
       [courseId],
       (err, rows) => {
 
@@ -396,7 +411,7 @@ app.post(
 
           return res.status(400).json({
             success: false,
-            error: 'Invalid or inactive course'
+            error: 'Applications are currently closed for this course'
           });
 
         }
