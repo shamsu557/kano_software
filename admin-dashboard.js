@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const staffCountEl = document.getElementById('staff-count');
   const studentCountEl = document.getElementById('student-count');
   const courseCountEl = document.getElementById('course-count');
-  const totalPaidEl = document.getElementById('total-paid');
+  // totalPaidEl removed
   const addCourseButton = document.getElementById('add-course-button');
   const addStaffButton = document.getElementById('add-staff-button');
   const addStudentButton = document.getElementById('add-student-button');
@@ -267,8 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data.success) {
       staffCountEl.textContent = data.tutors || 0;
       studentCountEl.textContent = data.students || 0;
-      courseCountEl.textContent = data.active || 0;
-      totalPaidEl.textContent = formatCurrency(data.revenue || 0);
+      courseCountEl.textContent = data.total || data.active || 0;
     } else {
       console.error('Failed to fetch dashboard data:', data.error);
       alert('Failed to load dashboard data. Please try again.');
@@ -379,17 +378,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="mb-3">
           <label class="form-label text-gray-700 font-medium">Mode</label>
-          <select name="mode" class="form-control" required>
+          <select name="mode" class="form-control" id="addCourseMode" required>
             <option value="">Select Mode</option>
             <option value="Physical">Physical</option>
             <option value="Online">Online</option>
-            <option value="Hybrid">Hybrid</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label text-gray-700 font-medium">Schedule</label>
-          <input type="text" name="schedule" class="form-control" placeholder="e.g., Morning, Evening, Weekend">
+        <div id="addScheduleFields">
+          <div class="mb-3">
+            <label class="form-label text-gray-700 font-medium">Session Time</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <select name="session_start" class="form-control" id="addSessionStart">
+                  <option value="">Start Time</option>
+                  <option value="8:00am">8:00am</option>
+                  <option value="9:00am">9:00am</option>
+                  <option value="10:00am">10:00am</option>
+                  <option value="11:00am">11:00am</option>
+                  <option value="12:00pm">12:00pm</option>
+                  <option value="1:00pm">1:00pm</option>
+                  <option value="2:00pm">2:00pm</option>
+                  <option value="3:00pm">3:00pm</option>
+                  <option value="5:00pm">5:00pm</option>
+                  <option value="6:00pm">6:00pm</option>
+                  <option value="7:00pm">7:00pm</option>
+                  <option value="8:00pm">8:00pm</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <select name="session_end" class="form-control" id="addSessionEnd">
+                  <option value="">End Time</option>
+                  <option value="9:00am">9:00am</option>
+                  <option value="10:00am">10:00am</option>
+                  <option value="11:00am">11:00am</option>
+                  <option value="12:00pm">12:00pm</option>
+                  <option value="1:00pm">1:00pm</option>
+                  <option value="2:00pm">2:00pm</option>
+                  <option value="3:00pm">3:00pm</option>
+                  <option value="4:00pm">4:00pm</option>
+                  <option value="5:00pm">5:00pm</option>
+                  <option value="6:00pm">6:00pm</option>
+                  <option value="7:00pm">7:00pm</option>
+                  <option value="8:00pm">8:00pm</option>
+                  <option value="9:00pm">9:00pm</option>
+                  <option value="10:00pm">10:00pm</option>
+                </select>
+              </div>
+            </div>
+            <small class="text-muted">e.g. 10:00am – 12:00pm or 12:00pm – 3:00pm</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-gray-700 font-medium">Class Days</label>
+            <div class="d-flex flex-wrap gap-2 mt-1" id="addDaysSelector">
+              ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d =>
+                `<label class="d-flex align-items-center gap-1 border rounded px-2 py-1" style="cursor:pointer;font-size:.85rem;background:#f8fafc;">
+                  <input type="checkbox" name="days[]" value="${d}" style="accent-color:#1A56DB;"> ${d}
+                </label>`).join('')}
+            </div>
+            <small class="text-muted">Select one or more days (e.g. Saturday + Sunday)</small>
+          </div>
         </div>
+        <input type="hidden" name="schedule" id="addScheduleHidden">
         <div class="mb-3">
           <label class="form-label text-gray-700 font-medium">Application Fee (₦)</label>
           <input type="number" name="application_fee" class="form-control" step="0.01" value="0" required>
@@ -429,6 +478,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentAction = 'add-course';
     showModal('Add New Course', formHtml, async (e) => {
       e.preventDefault();
+      // Build schedule string from time + days
+      buildScheduleString('add', e.target);
       // Serialize roadmap builder into hidden input
       serializeRoadmap('add');
       const formData = new FormData(e.target);
@@ -678,16 +729,51 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="mb-3">
             <label class="form-label text-gray-700 font-medium">Mode</label>
-            <select name="mode" class="form-control" required>
+            <select name="mode" class="form-control" id="editCourseMode" required>
               <option value="Physical" ${course.mode === 'Physical' ? 'selected' : ''}>Physical</option>
               <option value="Online" ${course.mode === 'Online' ? 'selected' : ''}>Online</option>
-              <option value="Hybrid" ${course.mode === 'Hybrid' ? 'selected' : ''}>Hybrid</option>
             </select>
           </div>
-          <div class="mb-3">
-            <label class="form-label text-gray-700 font-medium">Schedule</label>
-            <input type="text" name="schedule" value="${course.schedule || ''}" class="form-control">
+          <div id="editScheduleFields">
+            <div class="mb-3">
+              <label class="form-label text-gray-700 font-medium">Session Time</label>
+              <div class="row g-2">
+                <div class="col-6">
+                  <select name="session_start" class="form-control" id="editSessionStart">
+                    <option value="">Start Time</option>
+                    ${['8:00am','9:00am','10:00am','11:00am','12:00pm','1:00pm','2:00pm','3:00pm','5:00pm','6:00pm','7:00pm','8:00pm'].map(t => {
+                      const cur = (course.schedule || '').split(/[-–]/)[0]?.trim();
+                      return `<option value="${t}" ${cur === t ? 'selected' : ''}>${t}</option>`;
+                    }).join('')}
+                  </select>
+                </div>
+                <div class="col-6">
+                  <select name="session_end" class="form-control" id="editSessionEnd">
+                    <option value="">End Time</option>
+                    ${['9:00am','10:00am','11:00am','12:00pm','1:00pm','2:00pm','3:00pm','4:00pm','5:00pm','6:00pm','7:00pm','8:00pm','9:00pm','10:00pm'].map(t => {
+                      const cur = (course.schedule || '').split(/[-–]/)[1]?.split(',')[0]?.trim();
+                      return `<option value="${t}" ${cur === t ? 'selected' : ''}>${t}</option>`;
+                    }).join('')}
+                  </select>
+                </div>
+              </div>
+              <small class="text-muted">e.g. 10:00am – 12:00pm or 12:00pm – 3:00pm</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-gray-700 font-medium">Class Days</label>
+              <div class="d-flex flex-wrap gap-2 mt-1" id="editDaysSelector">
+                ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => {
+                  const scheduleDays = (course.schedule || '').split(',').slice(1).join(',');
+                  const checked = scheduleDays.includes(d) ? 'checked' : '';
+                  return `<label class="d-flex align-items-center gap-1 border rounded px-2 py-1" style="cursor:pointer;font-size:.85rem;background:#f8fafc;">
+                    <input type="checkbox" name="days[]" value="${d}" ${checked} style="accent-color:#1A56DB;"> ${d}
+                  </label>`;
+                }).join('')}
+              </div>
+              <small class="text-muted">Select one or more days (e.g. Saturday + Sunday)</small>
+            </div>
           </div>
+          <input type="hidden" name="schedule" id="editScheduleHidden">
           <div class="mb-3">
             <label class="form-label text-gray-700 font-medium">Application Fee (₦)</label>
             <input type="number" name="application_fee" value="${course.application_fee || 0}" class="form-control" step="0.01" required>
@@ -728,6 +814,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       showModal('Edit Course', formHtml, async (e) => {
         e.preventDefault();
+        buildScheduleString('edit', e.target);
         serializeRoadmap('edit');
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
@@ -1167,3 +1254,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await checkAuth();
 });
+
+/* ── Schedule Builder Helpers ── */
+
+/**
+ * Build a schedule string like "10:00am - 12:00pm, Saturday, Sunday"
+ * from the time dropdowns and day checkboxes, then set the hidden input.
+ */
+function buildScheduleString(prefix, form) {
+  const start = form.querySelector(`[name="session_start"]`)?.value || '';
+  const end   = form.querySelector(`[name="session_end"]`)?.value || '';
+  const days  = Array.from(form.querySelectorAll(`[name="days[]"]:checked`)).map(el => el.value);
+
+  let schedule = '';
+  if (start && end) {
+    schedule = `${start} - ${end}`;
+  }
+  if (days.length) {
+    schedule += (schedule ? ', ' : '') + days.join(', ');
+  }
+
+  const hidden = form.querySelector(`#${prefix}ScheduleHidden`);
+  if (hidden) hidden.value = schedule;
+}

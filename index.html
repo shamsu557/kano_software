@@ -301,6 +301,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
         <li class="nav-item"><a class="nav-link" href="#courses">Courses</a></li>
         <li class="nav-item"><a class="nav-link" href="#requirements">Requirements</a></li>
         <li class="nav-item"><a class="nav-link" href="#guide">Guide</a></li>
@@ -357,6 +358,55 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
     </div>
   </div>
 </div>
+
+<!-- SERVICES -->
+<section id="services" class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-label">What We Offer</span>
+      <h2 class="fw-bold mt-2">Our Services</h2>
+      <p class="text-muted">Beyond training — we build real solutions for real businesses.</p>
+    </div>
+    <div class="row gy-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 h-100 rounded-4 shadow-sm" style="border:2px solid #eff6ff;background:linear-gradient(135deg,#f0f7ff 0%,#fff 100%);transition:.3s;" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(26,86,219,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1A56DB,#0ea5e9);">
+            <i class="fas fa-code text-white" style="font-size:1.6rem;"></i>
+          </div>
+          <h6 class="fw-bold mb-2" style="color:#0D1B5E;">Software Engineering Training</h6>
+          <p class="text-muted small">AI-assisted, sprint-based practical training that takes learners from zero to deployment-ready engineers.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 h-100 rounded-4 shadow-sm" style="border:2px solid #f0fdf4;background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%);transition:.3s;" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(16,185,129,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#10B981,#059669);">
+            <i class="fas fa-globe text-white" style="font-size:1.6rem;"></i>
+          </div>
+          <h6 class="fw-bold mb-2" style="color:#0D1B5E;">Website Development</h6>
+          <p class="text-muted small">Clean, fast, and responsive websites tailored for businesses, portfolios, NGOs, and institutions.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 h-100 rounded-4 shadow-sm" style="border:2px solid #fefce8;background:linear-gradient(135deg,#fefce8 0%,#fff 100%);transition:.3s;" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(245,158,11,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#F59E0B,#d97706);">
+            <i class="fas fa-laptop-code text-white" style="font-size:1.6rem;"></i>
+          </div>
+          <h6 class="fw-bold mb-2" style="color:#0D1B5E;">Web Application Development</h6>
+          <p class="text-muted small">Full-stack web applications with dashboards, APIs, authentication systems, and database-driven features.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 h-100 rounded-4 shadow-sm" style="border:2px solid #fdf4ff;background:linear-gradient(135deg,#fdf4ff 0%,#fff 100%);transition:.3s;" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(139,92,246,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#8B5CF6,#7c3aed);">
+            <i class="fas fa-mobile-alt text-white" style="font-size:1.6rem;"></i>
+          </div>
+          <h6 class="fw-bold mb-2" style="color:#0D1B5E;">Mobile App Development</h6>
+          <p class="text-muted small">Cross-platform mobile applications for Android and iOS — turning your ideas into apps people actually use.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- COURSES -->
 <section id="courses" class="py-5 bg-light">
@@ -754,7 +804,7 @@ function buildStats(total, active, comingSoon, programmes) {
     <div class="col-6 col-md-3">
       <div class="stat-item">
         <div class="stat-num">${total}</div>
-        <div class="stat-lbl">Total Programmes</div>
+        <div class="stat-lbl">Total Courses</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
@@ -798,7 +848,8 @@ function buildCourseCard(c) {
     ? `<span class="meta-tag duration"><i class="fas fa-hourglass-half"></i>${escHtml(c.duration)}</span>`
     : '';
 
-  const modeTag     = c.mode     ? `<span class="meta-tag"><i class="fas fa-map-marker-alt"></i>${escHtml(c.mode)}</span>` : '';
+  const modeIcon    = c.mode === 'Online' ? 'fa-laptop' : 'fa-map-marker-alt';
+  const modeTag     = c.mode     ? `<span class="meta-tag"><i class="fas ${modeIcon}"></i>${escHtml(c.mode)}</span>` : '';
   const scheduleTag = c.schedule ? `<span class="meta-tag"><i class="fas fa-clock"></i>${escHtml(c.schedule)}</span>` : '';
   const metaTags    = [durationTag, modeTag, scheduleTag].filter(Boolean).join('');
 
@@ -816,9 +867,9 @@ function buildCourseCard(c) {
       ${regFee > 0 ? `<div class="fee-pill reg-fee"><span class="fee-amt">&#8358;${regFee.toLocaleString()}</span><span class="fee-lbl">Reg. Fee</span></div>` : ''}
     </div>`;
 
-  /* roadmap button — passes course id for apply link */
+  /* roadmap button — passes course id and isActive flag */
   const roadmapBtn = c.roadmap
-    ? `<button class="btn btn-outline-primary btn-sm" onclick='showRoadmap(${JSON.stringify(c.roadmap)}, ${JSON.stringify(c.name)}, ${c.id})'>
+    ? `<button class="btn btn-outline-primary btn-sm" onclick='showRoadmap(${JSON.stringify(c.roadmap)}, ${JSON.stringify(c.name)}, ${c.id}, ${c.is_active ? 1 : 0})'>
          <i class="fas fa-road me-1"></i>Roadmap
        </button>`
     : '';
@@ -826,7 +877,7 @@ function buildCourseCard(c) {
   /* apply URL is course-specific */
   const applyUrl = `/student/apply?courseId=${c.id}`;
 
-  /* footer — price + actions */
+  /* footer — price + actions. Roadmap always shown; Apply only for active */
   const footer = c.is_active
     ? `<div class="course-footer">
          ${feePills}
@@ -868,7 +919,7 @@ function escHtml(str) {
 /* ══════════════════════════════════════
    ROADMAP OVERLAY
 ══════════════════════════════════════ */
-function showRoadmap(roadmapData, courseName, courseId) {
+function showRoadmap(roadmapData, courseName, courseId, isActive) {
   /* parse if still a string */
   let rm = null;
   try {
@@ -879,9 +930,15 @@ function showRoadmap(roadmapData, courseName, courseId) {
 
   document.getElementById('rmTitle').textContent = (courseName || 'Course') + ' — Roadmap';
 
-  /* wire Apply button to course-specific URL */
-  const applyUrl = courseId ? `/student/apply?courseId=${courseId}` : '/student/apply';
-  document.getElementById('rmApplyBtn').onclick = () => window.location.href = applyUrl;
+  /* wire Apply button — only show for active courses */
+  const applyBtn = document.getElementById('rmApplyBtn');
+  if (isActive) {
+    const applyUrl = courseId ? `/student/apply?courseId=${courseId}` : '/student/apply';
+    applyBtn.onclick = () => window.location.href = applyUrl;
+    applyBtn.style.display = '';
+  } else {
+    applyBtn.style.display = 'none';
+  }
 
   const body = document.getElementById('rmBody');
 
