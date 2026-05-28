@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin-Login - KSRMS Technologies</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <!-- Custom CSS -->
+   <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/global.css"/>
+</head>
+<body class="bg-light">
+   <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand fw-bold brand-text" href="/">
+        <img src="/ksrms_logo.png" alt="KSRMS Technologies" style="height:38px;width:38px;object-fit:contain;border-radius:50%;background:#fff;padding:2px;margin-right:8px;"><span>KSRMS Technologies</span>
+      </a>
+      <div class="ms-auto">
+        <button class="btn btn-primary text-white" onclick="window.location.href='/'">
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      <!-- Left Side - Branding -->
+      <div class="col-lg-6  d-lg-flex align-items-center justify-content-center bg-primary">
+        <div class="text-center text-white">
+          <h1 class="display-4 fw-bold mb-4">Admin Portal</h1>
+          <p class="lead mb-4">Secure access to KSRMS Technologies administration system</p>
+          <div class="row text-center">
+            <div class="col-4">
+              <i class="fas fa-shield-alt fa-3x mb-3"></i>
+              <h5>Secure</h5>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-cogs fa-3x mb-3"></i>
+              <h5>Control</h5>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-chart-line fa-3x mb-3"></i>
+              <h5>Analytics</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Login Form -->
+      <div class="col-lg-6 d-flex align-items-center">
+        <div class="w-100 px-4 px-lg-5">
+          <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark">Administrator Login</h2>
+            <p class="text-muted">Sign in to access the admin dashboard</p>
+          </div>
+
+          <form id="login-form">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary w-100 py-3 mb-3">
+              <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+          </form>
+
+          <div id="login-error-message" class="text-danger text-center mt-2" style="display: none;"></div>
+
+          <div class="text-center mt-4">
+            <p class="mb-0 text-muted">Authorized personnel only</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Default Credentials Modal -->
+  <div class="modal fade" id="changeCredentialsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Default Credentials</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="changeCredentialsForm">
+            <div class="mb-3">
+              <label for="newUsername" class="form-label">New Username</label>
+              <input type="text" class="form-control" id="newUsername" required>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/admin-login.js"></script>
+</body>
+</html>

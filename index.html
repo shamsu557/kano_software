@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KSRMS Technologies — AI-Assisted Software Engineering</title>
+  <meta name="description" content="KSRMS Technologies — Kano Software Resources & Modern Solution. AI-assisted, 100% practical software engineering training." />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+/* ── TOKENS ── */
+:root {
+  --navy:    #0D1B5E;
+  --blue:    #1A56DB;
+  --gold:    #F59E0B;
+  --teal:    #0EA5E9;
+  --green:   #10B981;
+  --red:     #EF4444;
+  --surface: #f8fafc;
+  --border:  #e2e8f0;
+  --text:    #1e293b;
+  --muted:   #64748b;
+  --radius:  18px;
+  --shadow:  0 4px 24px rgba(0,0,0,.08);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.14);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; color: var(--text); }
+h1,h2,h3,h4,h5,h6 { font-family: 'Space Grotesk', sans-serif; }
+
+/* ── NAVBAR ── */
+.navbar { background: var(--navy) !important; z-index: 9999; }
+.navbar-brand { color: #fff !important; font-weight: 700; }
+.navbar-nav .nav-link { color: rgba(255,255,255,.92) !important; font-weight: 500; transition: .3s; }
+.navbar-nav .nav-link:hover { color: #fff !important; }
+
+.navbar-toggler { border: 2px solid rgba(255,255,255,.7) !important; box-shadow: none !important; padding: 8px 12px; background: rgba(255,255,255,.08); border-radius: 10px; position: relative; z-index: 10001; }
+.navbar-toggler:focus { box-shadow: none !important; }
+.navbar-toggler-icon { background-image: none !important; width: 28px; height: 28px; position: relative; }
+.navbar-toggler-icon::before { content: "\f0c9"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #fff; font-size: 1.4rem; position: absolute; top: 0; left: 0; }
+.navbar-toggler.active .navbar-toggler-icon::before { content: "\f00d"; }
+
+.mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 9990; display: none; }
+.mobile-overlay.show { display: block; }
+
+@media (max-width: 991.98px) {
+  .navbar-brand { max-width: 80%; }
+  .navbar-collapse { background: linear-gradient(135deg,#0D1B5E 0%,#17358f 100%); padding: 1rem; border-radius: 18px; margin-top: .7rem; box-shadow: 0 15px 35px rgba(0,0,0,.35); }
+  .navbar-nav { text-align: center; }
+  .navbar-nav .nav-link { padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,.08); color: #fff !important; }
+  .navbar-nav .nav-link:last-child { border-bottom: none; }
+  .navbar-nav .dropdown-menu { background: rgba(255,255,255,.12); border: none; border-radius: 12px; text-align: center; }
+  .navbar-nav .dropdown-item { color: #fff !important; padding: .8rem 1rem; }
+  .navbar-nav .dropdown-item:hover { background: rgba(255,255,255,.15); }
+  .btn-warning.ms-3 { margin-top: 1rem !important; width: 100%; }
+}
+
+/* ── HERO ── */
+.hero-section {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a3a8f 55%, #1e4fc0 100%);
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.hero-badge {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50px;
+  padding: 6px 18px;
+  font-size: .85rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 767px) {
+  .hero-section { padding: 6rem 0 3rem; text-align: center; min-height: auto; }
+  .hero-section h1 { font-size: 2rem; }
+  .hero-section .d-flex { justify-content: center !important; }
+  .hero-section .d-flex.flex-wrap.gap-3 { flex-wrap: nowrap !important; gap: .5rem !important; }
+  .hero-section .btn { width: 50%; font-size: .9rem; padding-left: .5rem; padding-right: .5rem; }
+  footer, footer p, footer h6 { text-align: center !important; }
+  footer .d-flex { justify-content: center !important; }
+}
+
+/* ── STATS BAR ── */
+.stat-item { padding: .5rem 1rem; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-size: 1.75rem; font-weight: 800; color: var(--navy); font-family: 'Space Grotesk', sans-serif; }
+.stat-lbl { font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+/* ── COURSE CARDS ── */
+.course-card { border: none; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: .3s; height: 100%; display: flex; flex-direction: column; background: #fff; }
+.course-card:hover { transform: translateY(-7px); box-shadow: var(--shadow-lg); }
+
+.course-card .card-img-wrap { position: relative; height: 195px; overflow: hidden; background: linear-gradient(135deg, var(--navy), var(--blue)); }
+.course-card .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.course-card:hover .card-img-wrap img { transform: scale(1.05); }
+.course-card .card-img-wrap .no-img-icon { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 3.5rem; color: rgba(255,255,255,.25); }
+
+.course-badge-wrap { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+.badge-active { background: var(--green); color: #fff; font-size: .7rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.badge-soon   { background: var(--gold); color: #111; font-size: .7rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.badge-cert   { background: rgba(255,255,255,.92); color: #333; font-size: .68rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+
+.course-card .card-body { padding: 1.3rem; display: flex; flex-direction: column; flex: 1; }
+.course-card .course-title { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: .3rem; line-height: 1.3; font-family: 'Space Grotesk', sans-serif; }
+.course-card .course-desc { font-size: .83rem; color: var(--muted); flex-grow: 1; line-height: 1.6; margin-bottom: .6rem; }
+
+.course-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: .6rem 0; }
+.meta-tag { background: #f1f5f9; color: #475569; font-size: .73rem; padding: 3px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px; font-weight: 500; }
+.meta-tag.duration { background: #eff6ff; color: var(--blue); font-weight: 700; }
+
+.course-start { font-size: .79rem; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-bottom: .75rem; }
+.dot-active { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 1.5s infinite; }
+.dot-soon   { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); display: inline-block; }
+
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.5; transform:scale(1.3); }
+}
+
+.course-footer { border-top: 1px solid var(--border); padding-top: .9rem; margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.course-price { font-size: 1.15rem; font-weight: 800; color: var(--navy); font-family: 'Space Grotesk', sans-serif; }
+.course-price small { font-size: .7rem; font-weight: 500; color: #9ca3af; display: block; line-height: 1; }
+.course-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── FEE PILLS ── */
+.fee-pills { display: flex; gap: 6px; flex-wrap: wrap; margin: .6rem 0 .4rem; }
+.fee-pill { display: flex; flex-direction: column; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 5px 12px; min-width: 90px; }
+.fee-pill .fee-amt { font-size: .95rem; font-weight: 800; color: var(--navy); font-family: 'Space Grotesk', sans-serif; line-height: 1.1; }
+.fee-pill .fee-lbl { font-size: .66rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-top: 1px; }
+.fee-pill.app-fee { border-color: #bfdbfe; background: #eff6ff; }
+.fee-pill.app-fee .fee-amt { color: var(--blue); }
+.fee-pill.reg-fee { border-color: #bbf7d0; background: #f0fdf4; }
+.fee-pill.reg-fee .fee-amt { color: #059669; }
+
+/* ── ROADMAP OVERLAY (full-page slide-in) ── */
+#roadmapOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10500;
+  background: #fff;
+  transform: translateX(100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#roadmapOverlay.open { transform: translateX(0); }
+
+.rm-header {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+  color: #fff;
+  padding: 1.1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.rm-back-btn {
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.35);
+  color: #fff;
+  border-radius: 10px;
+  padding: 7px 16px;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .2s;
+  white-space: nowrap;
+}
+.rm-back-btn:hover { background: rgba(255,255,255,.28); }
+.rm-header-info { flex: 1; min-width: 0; }
+.rm-header-title { font-size: 1.1rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rm-header-sub { font-size: .78rem; opacity: .8; margin-top: 2px; }
+.rm-apply-btn { background: var(--gold); color: #111; border: none; border-radius: 10px; padding: 8px 20px; font-weight: 700; font-size: .85rem; cursor: pointer; white-space: nowrap; transition: .2s; }
+.rm-apply-btn:hover { background: #e08e00; color: #fff; }
+.rm-body { flex: 1; overflow-y: auto; padding: 2rem 1.5rem; background: var(--surface); }
+
+@media (max-width: 575px) {
+  .rm-header { padding: .85rem 1rem; gap: .6rem; }
+  .rm-header-title { font-size: .95rem; }
+  .rm-apply-btn { display: none; }
+  .rm-body { padding: 1.2rem 1rem; }
+  .fee-pill { min-width: 78px; padding: 4px 8px; }
+  .fee-pill .fee-amt { font-size: .85rem; }
+}
+
+/* ── SKELETON ── */
+.skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 10px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── ROADMAP MODAL ── */
+.roadmap-phase-title { font-size: 1rem; font-weight: 700; color: var(--navy); padding: .6rem 1rem; background: #f0f4ff; border-radius: 10px; margin-bottom: .75rem; display: flex; align-items: center; gap: 8px; }
+.roadmap-sprint-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; height: 100%; }
+.roadmap-sprint-card .sprint-title { font-size: .85rem; font-weight: 700; color: var(--blue); margin-bottom: .5rem; font-family: 'Space Grotesk', sans-serif; }
+.roadmap-sprint-card ul li { font-size: .8rem; color: #4b5563; padding: 3px 0; border-bottom: 1px solid #f3f4f6; }
+.roadmap-sprint-card ul li:last-child { border-bottom: none; }
+
+/* ── PC SPECS SECTION ── */
+.specs-section { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; }
+.spec-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
+  height: 100%;
+  transition: .3s;
+  position: relative;
+  overflow: hidden;
+}
+.spec-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.06) 0%, transparent 60%);
+}
+.spec-card:hover { background: rgba(255,255,255,.1); transform: translateY(-4px); }
+.spec-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 1rem; }
+.spec-title { font-size: .95rem; font-weight: 700; margin-bottom: .35rem; font-family: 'Space Grotesk', sans-serif; }
+.spec-detail { font-size: .8rem; opacity: .75; line-height: 1.5; }
+.spec-ok { color: #4ade80; font-size: .72rem; font-weight: 700; letter-spacing: .04em; display: block; margin-top: .5rem; }
+.spec-min { color: var(--gold); font-size: .72rem; font-weight: 600; display: block; margin-top: .2rem; }
+
+/* ── LATE POLICY CARD ── */
+.late-policy-card {
+  background: rgba(239,68,68,.1);
+  border: 1.5px solid rgba(239,68,68,.35);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 2.5rem;
+}
+.late-policy-card h6 { color: #fca5a5; font-weight: 700; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif; }
+.penalty-row { display: flex; align-items: center; gap: 12px; padding: .55rem 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+.penalty-row:last-child { border-bottom: none; }
+.penalty-badge { min-width: 90px; text-align: center; padding: 4px 10px; border-radius: 8px; font-size: .75rem; font-weight: 700; }
+.penalty-text { font-size: .83rem; opacity: .88; }
+
+/* ── GUIDE / HOW IT WORKS ── */
+.feature-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+/* ── TERMS ── */
+.terms-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+.terms-box li { padding: .4rem 0; }
+
+/* ── TEAM ── */
+.team-card { background: #fff; border-radius: 20px; padding: 2rem; text-align: center; height: 100%; box-shadow: var(--shadow); transition: .3s; }
+.team-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+.team-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; border: 4px solid var(--blue); }
+
+/* ── ASSESSMENT CTA ── */
+.assessment-section { background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; }
+
+/* ── FOOTER ── */
+footer { background: var(--navy); color: rgba(255,255,255,.8); }
+
+/* ── MISC ── */
+.section-label { font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); }
+.back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; border: none; border-radius: 50%; background: var(--gold); color: #000; font-size: 1rem; cursor: pointer; display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,.25); transition: .2s; }
+.back-to-top:hover { transform: translateY(-3px); }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE OVERLAY -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img src="/ksrms_logo.png" alt="KSRMS" style="height:40px;width:40px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;" />
+      <div>
+        <div style="font-size:.95rem;line-height:1.1">KSRMS Technologies</div>
+        <small style="font-size:0.58rem;opacity:0.8;display:block;line-height:1.2;">Kano Software Resources &amp; Modern Solution</small>
+      </div>
+    </a>
+
+    <button class="navbar-toggler" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#courses">Courses</a></li>
+        <li class="nav-item"><a class="nav-link" href="#requirements">Requirements</a></li>
+        <li class="nav-item"><a class="nav-link" href="#guide">Guide</a></li>
+        <li class="nav-item"><a class="nav-link" href="#terms">Terms</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Login</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/student/login"><i class="fas fa-user-graduate me-2"></i>Student Login</a></li>
+            <li><a class="dropdown-item" href="/staff/login"><i class="fas fa-chalkboard-teacher me-2"></i>Tutor Login</a></li>
+            <li><a class="dropdown-item" href="/admin/login"><i class="fas fa-shield-alt me-2"></i>Admin Login</a></li>
+          </ul>
+        </li>
+      </ul>
+      <a href="/student/apply" class="btn btn-warning fw-bold ms-3 px-4">Enroll Now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container py-5">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6">
+        <span class="hero-badge"><i class="fas fa-robot me-2"></i>AI-Assisted Learning</span>
+        <h1 class="display-4 fw-bold mb-4">Software Development.<br>From Zero To Hero.</h1>
+        <p class="lead mb-4" style="opacity:.9">KSRMS Technologies delivers 100% practical, sprint-based software engineering training with AI tools woven into every phase.</p>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-warning"></i><span>100% Practical</span></div>
+          <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-warning"></i><span>AI Pair Coding</span></div>
+          <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-warning"></i><span>Sprint-Based</span></div>
+          <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-warning"></i><span>Live Deployment</span></div>
+        </div>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="/student/apply" class="btn btn-warning btn-lg fw-bold px-5">Apply Now</a>
+          <a href="#courses" class="btn btn-outline-light btn-lg px-5">Explore Courses</a>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="/ksrms_logo.png" alt="KSRMS" style="max-width:280px;width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,.4));" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="bg-white shadow-sm py-4">
+  <div class="container">
+    <div class="row text-center gy-3" id="statsBar">
+      <div class="col-6 col-md-3"><div class="skeleton mx-auto" style="height:32px;width:60px;border-radius:6px;"></div><div class="skeleton mx-auto mt-1" style="height:14px;width:80px;border-radius:6px;"></div></div>
+      <div class="col-6 col-md-3"><div class="skeleton mx-auto" style="height:32px;width:60px;border-radius:6px;"></div><div class="skeleton mx-auto mt-1" style="height:14px;width:80px;border-radius:6px;"></div></div>
+      <div class="col-6 col-md-3"><div class="skeleton mx-auto" style="height:32px;width:60px;border-radius:6px;"></div><div class="skeleton mx-auto mt-1" style="height:14px;width:80px;border-radius:6px;"></div></div>
+      <div class="col-6 col-md-3"><div class="skeleton mx-auto" style="height:32px;width:60px;border-radius:6px;"></div><div class="skeleton mx-auto mt-1" style="height:14px;width:80px;border-radius:6px;"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- COURSES -->
+<section id="courses" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-label">Training Programmes</span>
+      <h2 class="fw-bold mt-2">Our Courses</h2>
+      <p class="text-muted">AI-assisted, 100% practical programmes designed for real-world outcomes.<br>Each course has its own duration — see the programme card for details.</p>
+    </div>
+
+    <!-- Skeleton loader -->
+    <div class="row gy-4" id="coursesLoading">
+      <div class="col-md-6 col-lg-4"><div class="skeleton" style="height:400px;border-radius:18px;"></div></div>
+      <div class="col-md-6 col-lg-4"><div class="skeleton" style="height:400px;border-radius:18px;"></div></div>
+      <div class="col-md-6 col-lg-4"><div class="skeleton" style="height:400px;border-radius:18px;"></div></div>
+    </div>
+
+    <div class="row gy-4" id="coursesContainer" style="display:none;"></div>
+
+    <div id="coursesError" class="text-center py-4" style="display:none;">
+      <i class="fas fa-exclamation-circle text-danger fa-2x mb-3"></i>
+      <p class="text-danger fw-bold">Failed to load courses. Please check your connection.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     COMPUTER SPECIFICATIONS SECTION
+══════════════════════════════════════════════ -->
+<section id="requirements" class="specs-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span style="font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7dd3fc;">Laptop / PC Requirements</span>
+      <h2 class="fw-bold mt-2 text-white">Computer Specifications</h2>
+      <p style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto;">
+        You are required to come with your own laptop or PC to every session. Below are the minimum and recommended specifications.
+      </p>
+    </div>
+
+    <div class="row gy-3 gx-3">
+
+      <!-- Processor -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(59,130,246,.2);">
+            <i class="fas fa-microchip" style="color:#60a5fa;"></i>
+          </div>
+          <div class="spec-title">Processor</div>
+          <div class="spec-detail">Intel Core i5 or equivalent AMD</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+          <span class="spec-min"><i class="fas fa-info-circle me-1"></i>Min: Core i3</span>
+        </div>
+      </div>
+
+      <!-- Storage -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(16,185,129,.2);">
+            <i class="fas fa-hdd" style="color:#34d399;"></i>
+          </div>
+          <div class="spec-title">Storage</div>
+          <div class="spec-detail">SSD 256 GB or more preferred</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>SSD 256 GB+</span>
+          <span class="spec-min"><i class="fas fa-info-circle me-1"></i>Min: HDD 500 GB</span>
+        </div>
+      </div>
+
+      <!-- Battery -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(245,158,11,.2);">
+            <i class="fas fa-battery-three-quarters" style="color:#fbbf24;"></i>
+          </div>
+          <div class="spec-title">Battery</div>
+          <div class="spec-detail">Good battery life to last a full session</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>4+ hours</span>
+          <span class="spec-min"><i class="fas fa-exclamation-triangle me-1"></i>No dead battery</span>
+        </div>
+      </div>
+
+      <!-- Operating System -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(139,92,246,.2);">
+            <i class="fab fa-windows" style="color:#a78bfa;"></i>
+          </div>
+          <div class="spec-title">OS</div>
+          <div class="spec-detail">Windows 10 or Windows 11</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>Windows 11</span>
+          <span class="spec-min"><i class="fas fa-info-circle me-1"></i>Min: Windows 10</span>
+        </div>
+      </div>
+
+      <!-- Screen -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(236,72,153,.2);">
+            <i class="fas fa-desktop" style="color:#f472b6;"></i>
+          </div>
+          <div class="spec-title">Screen</div>
+          <div class="spec-detail">Medium size or larger, comfortable for coding</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>14 inch+</span>
+          <span class="spec-min"><i class="fas fa-info-circle me-1"></i>Min: 13 inch</span>
+        </div>
+      </div>
+
+      <!-- Internet -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="spec-card">
+          <div class="spec-icon" style="background:rgba(14,165,233,.2);">
+            <i class="fas fa-wifi" style="color:#38bdf8;"></i>
+          </div>
+          <div class="spec-title">Connectivity</div>
+          <div class="spec-detail">Wi-Fi & mobile data for practical submissions</div>
+          <span class="spec-ok"><i class="fas fa-check-circle me-1"></i>Wi-Fi + Data</span>
+          <span class="spec-min"><i class="fas fa-info-circle me-1"></i>Required online</span>
+        </div>
+      </div>
+
+    </div><!-- /row -->
+
+    <!-- Late Submission Policy -->
+    <div class="late-policy-card">
+      <h6><i class="fas fa-clock me-2"></i>Assignment Late Submission Policy</h6>
+      <p style="font-size:.82rem;opacity:.8;margin-bottom:1rem;">
+        Assignments must be submitted by the due date. Late submissions attract mark deductions as shown below:
+      </p>
+      <div class="row gy-2">
+        <div class="col-md-4">
+          <div class="penalty-row">
+            <div class="penalty-badge" style="background:rgba(239,68,68,.35);color:#fca5a5;">Day 1</div>
+            <div class="penalty-text"><strong style="color:#fff;">−20%</strong> of total marks deducted for submitting 1 day late.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="penalty-row">
+            <div class="penalty-badge" style="background:rgba(239,68,68,.5);color:#fca5a5;">Day 2</div>
+            <div class="penalty-text"><strong style="color:#fff;">−30%</strong> total — each additional day after day 1 attracts −10%.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="penalty-row">
+            <div class="penalty-badge" style="background:rgba(239,68,68,.7);color:#fca5a5;">Day 3+</div>
+            <div class="penalty-text"><strong style="color:#fff;">−10% per day</strong> continues to accumulate until submission or zero.</div>
+          </div>
+        </div>
+      </div>
+      <p class="mt-3 mb-0" style="font-size:.78rem;opacity:.65;"><i class="fas fa-info-circle me-1"></i>Maximum deduction is 100% of the assignment marks. Submitting is always better than not submitting.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-label">Leadership &amp; Tutors</span>
+      <h2 class="fw-bold mt-2">Meet Our Team</h2>
+      <p class="text-muted">Experienced professionals guiding students through practical software engineering training.</p>
+    </div>
+    <div class="row gy-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="team-card">
+          <img src="/images/shamsu.jpg" alt="Shamsu Sabo" onerror="this.src='https://ui-avatars.com/api/?name=Shamsu+Sabo&background=1A56DB&color=fff&size=120'">
+          <h5 class="fw-bold">Shamsu Sabo</h5>
+          <div class="text-primary fw-semibold mb-3">Information Technology Professional</div>
+          <p class="text-muted small">Skilled Fullstack Developer and Computer Engineer with experience in software development, educational systems, and AI-assisted technologies.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="team-card">
+          <img src="/images/shehu.jpg" alt="Shehu" onerror="this.src='https://ui-avatars.com/api/?name=Shehu&background=10B981&color=fff&size=120'">
+          <h5 class="fw-bold">Shehu</h5>
+          <div class="text-success fw-semibold mb-3">Fullstack Developer &amp; Python Engineer</div>
+          <p class="text-muted small">Skilled Fullstack Developer and experienced Python Engineer with strong expertise in backend systems, APIs, automation, and modern software engineering.</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="team-card">
+          <img src="/images/professor.jpg" alt="Assoc Prof" onerror="this.src='https://ui-avatars.com/api/?name=Abubakar+Umaru&background=F59E0B&color=111&size=120'">
+          <h5 class="fw-bold">Assoc. Prof. Abubakar Muhammad Umaru</h5>
+          <div class="text-warning fw-semibold mb-3">Programme Overseer</div>
+          <p class="text-muted small">Associate Professor of Cybersecurity and Database Professional with extensive academic and professional experience in information security and technology education.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUIDE -->
+<section id="guide" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-label">Student Guide</span>
+      <h2 class="fw-bold mt-2">How It Works</h2>
+    </div>
+    <div class="row gy-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 bg-white rounded-4 shadow-sm h-100">
+          <div class="feature-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3"><i class="fas fa-laptop"></i></div>
+          <h6 class="fw-bold">Bring Your PC</h6>
+          <p class="text-muted small">You must come with a working laptop or PC to every session. See the requirements section for specs.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 bg-white rounded-4 shadow-sm h-100">
+          <div class="feature-icon bg-success bg-opacity-10 text-success mx-auto mb-3"><i class="fas fa-code"></i></div>
+          <h6 class="fw-bold">Code Every Session</h6>
+          <p class="text-muted small">Every session is sprint-based and 100% practical. No passive learning.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 bg-white rounded-4 shadow-sm h-100">
+          <div class="feature-icon bg-warning bg-opacity-10 text-warning mx-auto mb-3"><i class="fas fa-robot"></i></div>
+          <h6 class="fw-bold">AI-Graded Assignments</h6>
+          <p class="text-muted small">Submit your code online and receive instant detailed feedback powered by AI.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center p-4 bg-white rounded-4 shadow-sm h-100">
+          <div class="feature-icon bg-danger bg-opacity-10 text-danger mx-auto mb-3"><i class="fas fa-award"></i></div>
+          <h6 class="fw-bold">Graduate &amp; Certify</h6>
+          <p class="text-muted small">Score at least 50% overall to graduate and receive your certificate.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERMS -->
+<section id="terms" class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-label">Policies</span>
+      <h2 class="fw-bold mt-2">Terms &amp; Conditions</h2>
+    </div>
+    <div class="row gy-3" id="termsContainer">
+      <div class="col-md-6">
+        <div class="terms-box h-100">
+          <h6 class="fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Financial Policies</h6>
+          <ul class="mt-3 ps-3">
+            <li>Registration fees are <strong>non-refundable</strong>.</li>
+            <li>Fees may be paid in installments — confirm with admin.</li>
+            <li>Graduation fee is charged separately at programme end.</li>
+            <li>Your certificate is released only after full payment is confirmed.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="terms-box h-100">
+          <h6 class="fw-bold text-primary"><i class="fas fa-laptop me-2"></i>Laptop &amp; Attendance</h6>
+          <ul class="mt-3 ps-3">
+            <li>Students must bring their own laptop every session.</li>
+            <li>Attendance is compulsory — minimum attendance required.</li>
+            <li>All assignments must be attempted and submitted.</li>
+            <li>Minimum <strong>50% overall score</strong> is required to graduate.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="terms-box h-100">
+          <h6 class="fw-bold text-warning"><i class="fas fa-clock me-2"></i>Submission Policy</h6>
+          <ul class="mt-3 ps-3">
+            <li>Submit assignments before the due date to avoid deductions.</li>
+            <li><strong>1 day late</strong> → 20% of marks deducted.</li>
+            <li><strong>Each day after the first</strong> → additional 10% deducted.</li>
+            <li>Always submit — partial marks are better than zero.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="terms-box h-100">
+          <h6 class="fw-bold text-success"><i class="fas fa-shield-alt me-2"></i>Conduct &amp; Ethics</h6>
+          <ul class="mt-3 ps-3">
+            <li>All submitted work must be your own original code.</li>
+            <li>Plagiarism results in disqualification from that assignment.</li>
+            <li>Respect tutors, fellow students, and the learning environment.</li>
+            <li>AI tools may be used but you must understand every line you submit.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="assessment-section py-5 text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Ready to Start Your Journey?</h2>
+    <p class="mb-4 fs-5" style="opacity:.9">Join KSRMS Technologies and build real software from day one.</p>
+    <a href="/student/apply" class="btn btn-warning btn-lg fw-bold px-5 me-3">Apply Now</a>
+    <a href="/student/login" class="btn btn-outline-light btn-lg px-5">Student Portal</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact" class="py-5">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <img src="/ksrms_logo.png" alt="KSRMS" style="width:50px;height:50px;object-fit:contain;background:#fff;border-radius:8px;padding:3px;" />
+          <div>
+            <div class="fw-bold text-white">KSRMS Technologies</div>
+            <small>Kano Software Resources &amp; Modern Solution</small>
+          </div>
+        </div>
+        <p class="small">Building the next generation of software engineers through AI-assisted practical training.</p>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="text-white fw-bold">Contact</h6>
+        <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-warning"></i>Technology Business Incubation Centre, Kano State, Nigeria</p>
+        <p class="small mb-1"><i class="fas fa-globe me-2 text-warning"></i>www.ksrms.com.ng</p>
+        <p class="small mb-1"><i class="fas fa-envelope me-2 text-warning"></i>info@ksrms.com.ng</p>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="text-white fw-bold">Quick Links</h6>
+        <div class="d-flex flex-column gap-1">
+          <a href="#courses" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Our Courses</a>
+          <a href="#requirements" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">PC Requirements</a>
+          <a href="/student/apply" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Apply Now</a>
+          <a href="/student/login" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Student Portal</a>
+        </div>
+      </div>
+    </div>
+    <hr style="border-color:rgba(255,255,255,.2)">
+    <p class="text-center small mb-0">© 2025 KSRMS Technologies. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- ROADMAP FULL-SCREEN OVERLAY -->
+<div id="roadmapOverlay" role="dialog" aria-modal="true" aria-label="Course Roadmap">
+  <div class="rm-header">
+    <button class="rm-back-btn" id="rmBackBtn" onclick="closeRoadmap()">
+      <i class="fas fa-arrow-left"></i> Back to Courses
+    </button>
+    <div class="rm-header-info">
+      <div class="rm-header-title" id="rmTitle">Course Roadmap</div>
+      <div class="rm-header-sub" id="rmSub"></div>
+    </div>
+    <button class="rm-apply-btn" id="rmApplyBtn" onclick="window.location.href='/student/apply'">
+      <i class="fas fa-pen me-1"></i>Apply Now
+    </button>
+  </div>
+  <div class="rm-body" id="rmBody"></div>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="backToTop" class="back-to-top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* ══════════════════════════════════════
+   LOAD COURSES FROM API
+══════════════════════════════════════ */
+(async () => {
+  try {
+    const res = await fetch('/api/courses');
+    if (!res.ok) throw new Error('Server error');
+    const courses = await res.json();
+
+    document.getElementById('coursesLoading').style.display = 'none';
+    const container = document.getElementById('coursesContainer');
+    container.style.display = '';
+
+    if (!courses.length) {
+      container.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+          <p class="text-muted fw-semibold">No courses available yet. Check back soon!</p>
+        </div>`;
+      buildStats(0, 0, 0, 0);
+      return;
+    }
+
+    container.innerHTML = courses.map(c => buildCourseCard(c)).join('');
+
+    /* Stats bar */
+    const active    = courses.filter(c => c.is_active).length;
+    const inactive  = courses.filter(c => !c.is_active).length;
+    buildStats(courses.length, active, inactive, courses.length);
+
+  } catch (e) {
+    document.getElementById('coursesLoading').style.display = 'none';
+    document.getElementById('coursesError').style.display = 'block';
+    buildStats(0, 0, 0, 0);
+  }
+})();
+
+/* ── Stats bar helper ── */
+function buildStats(total, active, comingSoon, programmes) {
+  document.getElementById('statsBar').innerHTML = `
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">${total}</div>
+        <div class="stat-lbl">Total Programmes</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--green)">${active}</div>
+        <div class="stat-lbl">Now Enrolling</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--gold)">${comingSoon}</div>
+        <div class="stat-lbl">Coming Soon</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">Practical Training</div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════
+   BUILD COURSE CARD
+══════════════════════════════════════ */
+function buildCourseCard(c) {
+  /* image or placeholder */
+  const imgHtml = c.image_path
+    ? `<img src="${c.image_path}" alt="${escHtml(c.name)}" loading="lazy">`
+    : `<div class="no-img-icon"><i class="fas fa-laptop-code"></i></div>`;
+
+  /* status badge — active = currently enrolling, inactive = coming soon */
+  const statusBadge = c.is_active
+    ? `<span class="badge-active"><i class="fas fa-circle" style="font-size:.45rem;vertical-align:middle;margin-right:4px;"></i>Active</span>`
+    : `<span class="badge-soon"><i class="fas fa-clock" style="font-size:.6rem;margin-right:4px;"></i>Coming Soon</span>`;
+
+  const certBadge = `<span class="badge-cert">${escHtml(c.certification_type || 'Certificate')}</span>`;
+
+  /* duration tag — pulled directly from the course record */
+  const durationTag = c.duration
+    ? `<span class="meta-tag duration"><i class="fas fa-hourglass-half"></i>${escHtml(c.duration)}</span>`
+    : '';
+
+  const modeTag     = c.mode     ? `<span class="meta-tag"><i class="fas fa-map-marker-alt"></i>${escHtml(c.mode)}</span>` : '';
+  const scheduleTag = c.schedule ? `<span class="meta-tag"><i class="fas fa-clock"></i>${escHtml(c.schedule)}</span>` : '';
+  const metaTags    = [durationTag, modeTag, scheduleTag].filter(Boolean).join('');
+
+  /* enrolment status line */
+  const startLine = c.is_active
+    ? `<div class="course-start"><span class="dot-active"></span> Currently enrolling</div>`
+    : `<div class="course-start"><span class="dot-soon"></span> Enrolment opening soon</div>`;
+
+  /* fee pills — always show both fees if present */
+  const appFee = Number(c.application_fee || 0);
+  const regFee = Number(c.registration_fee || 0);
+  const feePills = `
+    <div class="fee-pills">
+      ${appFee > 0 ? `<div class="fee-pill app-fee"><span class="fee-amt">&#8358;${appFee.toLocaleString()}</span><span class="fee-lbl">App. Fee</span></div>` : ''}
+      ${regFee > 0 ? `<div class="fee-pill reg-fee"><span class="fee-amt">&#8358;${regFee.toLocaleString()}</span><span class="fee-lbl">Reg. Fee</span></div>` : ''}
+    </div>`;
+
+  /* roadmap button — passes course id for apply link */
+  const roadmapBtn = c.roadmap
+    ? `<button class="btn btn-outline-primary btn-sm" onclick='showRoadmap(${JSON.stringify(c.roadmap)}, ${JSON.stringify(c.name)}, ${c.id})'>
+         <i class="fas fa-road me-1"></i>Roadmap
+       </button>`
+    : '';
+
+  /* apply URL is course-specific */
+  const applyUrl = `/student/apply?courseId=${c.id}`;
+
+  /* footer — price + actions */
+  const footer = c.is_active
+    ? `<div class="course-footer">
+         ${feePills}
+         <div class="course-actions" style="margin-left:auto;">
+           ${roadmapBtn}
+           <a href="${applyUrl}" class="btn btn-primary btn-sm"><i class="fas fa-pen me-1"></i>Apply Now</a>
+         </div>
+       </div>`
+    : `<div class="course-footer">
+         ${feePills}
+         <div class="text-muted small mt-1"><i class="fas fa-bell me-1"></i>Check back for enrollment dates</div>
+         <div class="course-actions" style="margin-left:auto;">${roadmapBtn}</div>
+       </div>`;
+
+  return `
+    <div class="col-md-6 col-lg-4">
+      <div class="course-card">
+        <div class="card-img-wrap">
+          ${imgHtml}
+          <div class="course-badge-wrap">${statusBadge}${certBadge}</div>
+        </div>
+        <div class="card-body">
+          <div class="course-title">${escHtml(c.name)}</div>
+          <div class="course-meta">${metaTags}</div>
+          <div class="course-desc">${escHtml((c.description || '').substring(0, 160))}${(c.description || '').length > 160 ? '…' : ''}</div>
+          ${startLine}
+          ${footer}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── HTML escape helper ── */
+function escHtml(str) {
+  if (typeof str !== 'string') return str ?? '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════
+   ROADMAP OVERLAY
+══════════════════════════════════════ */
+function showRoadmap(roadmapData, courseName, courseId) {
+  /* parse if still a string */
+  let rm = null;
+  try {
+    rm = typeof roadmapData === 'string' ? JSON.parse(roadmapData) : roadmapData;
+  } catch(e) {
+    rm = null;
+  }
+
+  document.getElementById('rmTitle').textContent = (courseName || 'Course') + ' — Roadmap';
+
+  /* wire Apply button to course-specific URL */
+  const applyUrl = courseId ? `/student/apply?courseId=${courseId}` : '/student/apply';
+  document.getElementById('rmApplyBtn').onclick = () => window.location.href = applyUrl;
+
+  const body = document.getElementById('rmBody');
+
+  /* ── Case 1: structured phases from builder ── */
+  if (rm && rm.phases && rm.phases.length) {
+    document.getElementById('rmSub').textContent =
+      `${rm.phases.length} Phase${rm.phases.length !== 1 ? 's' : ''}`;
+
+    body.innerHTML = rm.phases.map((phase, pi) => `
+      <div class="mb-4">
+        <div class="roadmap-phase-title">
+          <span class="badge bg-primary">${pi + 1}</span>
+          ${escHtml(phase.title)}
+          ${phase.duration ? `<span class="ms-auto text-muted fw-normal" style="font-size:.8rem;">${escHtml(phase.duration)}</span>` : ''}
+        </div>
+        <div class="row gy-3">
+          ${(phase.sprints || []).map(sprint => `
+            <div class="col-md-6">
+              <div class="roadmap-sprint-card">
+                <div class="sprint-title">
+                  <i class="fas fa-rocket me-2"></i>Sprint ${sprint.sprint}: ${escHtml(sprint.title)}
+                </div>
+                <ul class="list-unstyled mb-0">
+                  ${(sprint.topics || []).map(t => `
+                    <li><i class="fas fa-code text-primary me-2 opacity-50" style="font-size:.7rem;"></i>${escHtml(t)}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+
+  /* ── Case 2: plain text / unstructured content ── */
+  } else {
+    document.getElementById('rmSub').textContent = '';
+    const text = typeof roadmapData === 'string' ? roadmapData : JSON.stringify(roadmapData, null, 2);
+    body.innerHTML = `<div class="roadmap-sprint-card"><pre style="white-space:pre-wrap;font-family:inherit;margin:0;">${escHtml(text)}</pre></div>`;
+  }
+
+  /* scroll overlay to top, then open */
+  body.scrollTop = 0;
+  const overlay = document.getElementById('roadmapOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRoadmap() {
+  document.getElementById('roadmapOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* Close overlay on Escape key */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeRoadmap();
+});
+
+/* ══════════════════════════════════════
+   MOBILE MENU
+══════════════════════════════════════ */
+const toggler        = document.querySelector('.navbar-toggler');
+const navbarCollapse = document.getElementById('navbarNav');
+const mobileOverlay  = document.getElementById('mobileOverlay');
+const bsCollapse     = new bootstrap.Collapse(navbarCollapse, { toggle: false });
+
+toggler.addEventListener('click', () => {
+  navbarCollapse.classList.contains('show') ? bsCollapse.hide() : bsCollapse.show();
+});
+navbarCollapse.addEventListener('show.bs.collapse', () => {
+  toggler.classList.add('active');
+  mobileOverlay?.classList.add('show');
+});
+navbarCollapse.addEventListener('hide.bs.collapse', () => {
+  toggler.classList.remove('active');
+  mobileOverlay?.classList.remove('show');
+});
+document.querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)').forEach(link => {
+  link.addEventListener('click', () => { if (window.innerWidth < 992) bsCollapse.hide(); });
+});
+mobileOverlay?.addEventListener('click', () => bsCollapse.hide());
+document.addEventListener('click', e => {
+  if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')
+      && !navbarCollapse.contains(e.target) && !toggler.contains(e.target)) {
+    bsCollapse.hide();
+  }
+});
+
+/* ══════════════════════════════════════
+   BACK TO TOP
+══════════════════════════════════════ */
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
+});
+backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Signup - KSRMS Technologies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+    <link href="/global.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="alert-container position-fixed top-0 end-0 p-3" style="z-index: 9999; max-width: 400px;"></div>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold brand-text" href="/">
+                <img src="/ksrms_logo.png" alt="KSRMS Technologies" style="height:38px;width:38px;object-fit:contain;border-radius:50%;background:#fff;padding:2px;margin-right:8px;"><span>KSRMS Technologies</span>
+            </a>
+            <div class="ms-auto">
+                <button class="btn btn-primary text-white" onclick="window.location.href='/'">
+                    Back to Home
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <div class="col-lg-6 d-lg-flex align-items-center justify-content-center bg-primary">
+                <div class="text-center text-white p-5">
+                    <h1 class="display-4 fw-bold mb-4">Join Our Team</h1>
+                    <p class="lead mb-4">Become part of KSRMS Technologies's mission to provide quality technical education</p>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <i class="fas fa-users fa-3x mb-3"></i>
+                            <h5>Expert Faculty</h5>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                            <h5>Quality Education</h5>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-trophy fa-3x mb-3"></i>
+                            <h5>Excellence</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="w-100 px-4 px-lg-5 py-5">
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold text-primary">Staff Registration</h2>
+                        <p class="text-muted">Create your staff account</p>
+                    </div>
+
+                    <form id="staffSignupForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="firstName" required aria-required="true">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="lastName" required aria-required="true">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" required aria-required="true">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="phone" required aria-required="true">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="courses" class="form-label">Courses <span class="text-danger">*</span></label>
+                            <select class="form-select" id="courses" multiple required aria-required="true">
+                            </select>
+                            <div class="form-text">Hold down the Ctrl (Windows) or Command (Mac) button to select multiple courses.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="positions" class="form-label">Positions <span class="text-danger">*</span></label>
+                            <select class="form-select" id="positions" multiple required aria-required="true">
+                            </select>
+                            <div class="form-text">Hold down the Ctrl (Windows) or Command (Mac) button to select multiple positions.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="qualifications" class="form-label">Qualifications <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="qualifications" rows="3" placeholder="List your relevant qualifications and experience" required aria-required="true"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="profilePicture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" required aria-required="true">
+                            <div class="form-text" id="passwordHelp">Password must be at least 8 characters long.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" required aria-required="true">
+                        </div>
+                        
+                        <hr class="my-4">
+                        <div class="text-center mb-3">
+                            <h4 class="text-primary">Security Question</h4>
+                            <p class="text-muted">For password recovery purposes</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="securityQuestion" class="form-label">Security Question <span class="text-danger">*</span></label>
+                            <select class="form-select" id="securityQuestion" required aria-required="true">
+                                <option value="" disabled selected>Select a question...</option>
+                                <option value="What was your first pet's name?">What was your first pet's name?</option>
+                                <option value="In what city were you born?">In what city were you born?</option>
+                                <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                <option value="What was the name of your first school?">What was the name of your first school?</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="securityAnswer" class="form-label">Your Answer <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="securityAnswer" required aria-required="true">
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="agreeTerms" required aria-required="true">
+                                <label class="form-check-label" for="agreeTerms">
+                                    I agree to the <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a> and <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Staff Account
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account? <a href="/staff/login" class="text-primary fw-semibold">Sign In</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="loadingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 id="loadingModalLabel">Creating your account...</h5>
+                    <p class="text-muted mb-0">Please wait while we process your registration</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome to KSRMS Technologies! By using our platform, you agree to comply with and be bound by the following Terms and Conditions. Please review them carefully.</p>
+
+                    <h5>1. User Responsibilities</h5>
+                    <ul>
+                        <li>You agree to provide accurate, complete, and up-to-date information during the registration process.</li>
+                        <li>You are responsible for maintaining the confidentiality of your account password.</li>
+                        <li>You agree not to use this platform for any unlawful or prohibited activities.</li>
+                    </ul>
+
+                    <h5>2. Intellectual Property</h5>
+                    <p>All content, including text, graphics, logos, and course materials, is the exclusive property of KSRMS Technologies or its licensors and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our express permission.</p>
+
+                    <h5>3. Limitation of Liability</h5>
+                    <p>KSRMS Technologies will not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our services. We do not guarantee that the service will be uninterrupted, error-free, or secure.</p>
+                    
+                    <h5>4. Governing Law</h5>
+                    <p>These Terms and Conditions are governed by the laws of the Federal Republic of Nigeria.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This Privacy Policy describes how KSRMS Technologies collects, uses, and protects your personal information.</p>
+
+                    <h5>1. Information We Collect</h5>
+                    <p>We collect personal information that you provide to us directly, such as your name, email address, phone number, and qualifications. This information is necessary to create and manage your staff account.</p>
+                    
+                    <h5>2. How We Use Your Information</h5>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Process your staff registration and manage your account.</li>
+                        <li>Communicate with you regarding your application and platform updates.</li>
+                        <li>Improve our services and the user experience.</li>
+                        <li>Ensure the security and integrity of our platform.</li>
+                    </ul>
+
+                    <h5>3. Data Security</h5>
+                    <p>We implement a variety of security measures, including encryption and hashing, to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to protect your data, we cannot guarantee its absolute security.</p>
+                    
+                    <h5>4. Your Rights</h5>
+                    <p>You have the right to access, update, or request the deletion of your personal information. If you wish to exercise these rights, please contact us at 08030909793.</p>
+
+                    <h5>5. Changes to This Policy</h5>
+                    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page. Your continued use of the platform after any changes indicates your acceptance of the new policy.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/staff-signup.js"></script>
+</body>
+</html>

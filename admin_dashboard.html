@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - KSRMS Technologies</title>
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" id="dashboard-container">
+        
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header text-center mb-4">
+                <img src="/logo.png" alt="KSRMS Logo" style="max-width: 90px; margin-bottom: 10px;">
+                <h4 class="mb-0 text-primary">KSRMS Admin</h4>
+                <small class="text-muted">AI Software Engineering Portal</small>
+            </div>
+            
+            <ul class="nav flex-column flex-grow-1">
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button active" data-tab="overview"><i class="fas fa-tachometer-alt me-2"></i>Overview</button>
+                </li>
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button" data-tab="courses"><i class="fas fa-book-open me-2"></i>Course Management</button>
+                </li>
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button" data-tab="staff"><i class="fas fa-users me-2"></i>Staff Management</button>
+                </li>
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button" data-tab="students"><i class="fas fa-graduation-cap me-2"></i>Student Management</button>
+                </li>
+                <li class="nav-item mb-2 hidden" id="admin-management-tab">
+                    <button class="nav-link tab-button" data-tab="admins"><i class="fas fa-user-shield me-2"></i>Admin Management</button>
+                </li>
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button" data-tab="resources"><i class="fas fa-book me-2"></i>Resources Management</button>
+                </li>
+                <li class="nav-item mb-2">
+                    <button class="nav-link tab-button" data-tab="generate"><i class="fas fa-id-card me-2"></i>ID/Certificate Generator</button>
+                </li>
+            </ul>
+            
+            <div class="mt-auto p-3">
+                <button id="logout-button" class="btn btn-danger w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="main-content">
+            <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+            <h2 class="section-title text-2xl font-bold text-gray-800 mb-4" id="pageTitle">Overview</h2>
+
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-gray-600 text-uppercase mb-1">Total Staff</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="staff-count">...</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-gray-600 text-uppercase mb-1">Total Students</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="student-count">...</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-gray-600 text-uppercase mb-1">Active Courses</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="course-count">...</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-gray-600 text-uppercase mb-1">Total Paid Fees</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-paid">...</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-gray-800">Payment Records</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="payments-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Payment Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Management Tab -->
+            <div id="courses-tab" class="tab-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Course Management</h2>
+                    <button id="add-course-button" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus me-1"></i>Add New Course
+                    </button>
+                </div>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="courses-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course Name</th>
+                                        <th>Duration</th>
+                                        <th>Mode</th>
+                                        <th>Application Fee</th>
+                                        <th>Registration Fee</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Management -->
+            <div id="staff-tab" class="tab-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Staff Management</h2>
+                    <button id="add-staff-button" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Staff
+                    </button>
+                </div>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="staff-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Position</th>
+                                        <th>Courses</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Management -->
+            <div id="students-tab" class="tab-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
+                    <button id="add-student-button" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Student
+                    </button>
+                </div>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="students-table">
+                                <thead>
+                                    <tr>
+                                        <th>Admission No</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Course</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Management -->
+            <div id="admins-tab" class="tab-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Admin Management</h2>
+                    <button id="add-admin-button" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Admin
+                    </button>
+                </div>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="admins-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Management -->
+            <div id="resources-tab" class="tab-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Resources Management</h2>
+                    <button id="add-resource-button" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Resource
+                    </button>
+                </div>
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Course</th>
+                                        <th>File</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ID/Certificate Generator -->
+            <div id="generate-tab" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">ID/Certificate Generator</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-gray-800">Generate ID Card</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id-card-entity-type" class="form-label">Select Type</label>
+                                        <select id="id-card-entity-type" class="form-select">
+                                            <option value="student">Student</option>
+                                            <option value="staff">Staff</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id-card-entity-id" class="form-label">Entity ID</label>
+                                        <input type="text" id="id-card-entity-id" placeholder="e.g., 101" class="form-control">
+                                    </div>
+                                </div>
+                                <button id="generate-id-card-button" class="btn btn-success">Generate ID Card</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-gray-800">Generate Certificate</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="certificate-student-id" class="form-label">Student ID</label>
+                                    <input type="text" id="certificate-student-id" placeholder="e.g., 205" class="form-control">
+                                </div>
+                                <button id="generate-certificate-button" class="btn btn-success">Generate Certificate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal fade" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-title">Modal Title</h5>
+                        <button type="button" class="btn-close" id="close-modal-button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="modal-form"></form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="close-modal-button-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" form="modal-form">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin-dashboard.js"></script>
+</body>
+</html>
