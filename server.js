@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -18,11 +20,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const PAYSTACK_SECRET_KEY =
+  process.env.PAYSTACK_SECRET_KEY ||
   process.env.PAYSTACK_KEY ||
   'sk_live_b04d777ada9b06c828dc4084969106de9d8044a3';
 
 const PAYSTACK_PUBLIC_KEY =
-  process.env.PAYSTACK_PUBLIC_KEY || '';
+  process.env.PAYSTACK_PUBLIC_KEY ||
+  process.env.PAYSTACK_PK ||
+  'pk_live_661e479efe8cccc078d6e6c078a5b6e0dc963079';
 
 const ANTHROPIC_API_KEY =
   process.env.ANTHROPIC_API_KEY || '';
@@ -613,10 +618,15 @@ app.post('/api/student/login', async (req, res) => {
 
     const student = rows[0];
 
-    const match = await bcrypt.compare(
-      password,
-      student.password_hash || ''
-    );
+    // For first-time students whose password_hash is NULL,
+    // accept their admission number as the temporary password.
+    let match = false;
+    if (!student.password_hash) {
+      // No password set yet — only allow login with admission number as password
+      match = (password === student.admission_number);
+    } else {
+      match = await bcrypt.compare(password, student.password_hash);
+    }
 
     if (!match) {
 
@@ -634,11 +644,13 @@ app.post('/api/student/login', async (req, res) => {
 
     res.json({
       success: true,
+      isFirstLogin: student.is_first_login === 1,
       student: {
         id: student.id,
         name: req.session.studentName,
         admission_number: student.admission_number,
-        course: student.course_name
+        course: student.course_name,
+        is_first_login: student.is_first_login
       }
     });
 
@@ -1147,17 +1159,16 @@ app.post('/api/payment/verify-registration', async (req, res) => {
             };
 
             if (needsAdmission) {
-              bcrypt.hash(admNum, 10, (e3, hash) => {
-                if (e3) return res.status(500).json({ success: false, error: 'Server error' });
-                db.query(
-                  'UPDATE students SET admission_number=?, password_hash=?, batch_id=?, status=? WHERE id=?',
-                  [admNum, hash, batchId, 'Active', studentId],
-                  (e4) => {
-                    if (e4) return res.status(500).json({ success: false, error: 'Failed to update student' });
-                    savePayment();
-                  }
-                );
-              });
+              // Assign admission number + batch + mark Active + is_first_login=1
+              // Password is NOT set here — student will set it on first login
+              db.query(
+                'UPDATE students SET admission_number=?, password_hash=NULL, batch_id=?, status=?, is_first_login=1 WHERE id=?',
+                [admNum, batchId, 'Active', studentId],
+                (e4) => {
+                  if (e4) return res.status(500).json({ success: false, error: 'Failed to update student' });
+                  savePayment();
+                }
+              );
             } else {
               db.query('UPDATE students SET status=? WHERE id=?', ['Active', studentId], (e4) => {
                 if (e4) return res.status(500).json({ success: false, error: 'Failed to update student' });
@@ -1205,11 +1216,12 @@ app.post('/api/student/setup-security', async (req, res) => {
     return res.status(400).json({ success: false, error: 'All fields are required' });
   }
   try {
-    const hash = await bcrypt.hash(pwd, 10);
+    const pwdHash    = await bcrypt.hash(pwd, 10);
     const normAnswer = securityAnswer.trim().toUpperCase();
+    const ansHash    = await bcrypt.hash(normAnswer, 10);  // bcrypt-hash the security answer
     db.query(
       'UPDATE students SET password_hash=?, security_question=?, security_answer=?, is_first_login=0 WHERE id=?',
-      [hash, securityQuestion, normAnswer, sid],
+      [pwdHash, securityQuestion, ansHash, sid],
       (err) => {
         if (err) return res.status(500).json({ success: false, error: 'Failed to save security details' });
         res.json({ success: true });
@@ -1244,9 +1256,11 @@ app.post('/api/student/forgot-password/reset', async (req, res) => {
   }
   db.query('SELECT id, security_answer FROM students WHERE admission_number=?', [admissionNumber], async (err, rows) => {
     if (err || !rows.length) return res.status(404).json({ success: false, error: 'Account not found' });
-    const stored = rows[0].security_answer;
+    const stored   = rows[0].security_answer;
     const provided = securityAnswer.trim().toUpperCase();
-    if (stored !== provided) return res.status(401).json({ success: false, error: 'Incorrect answer' });
+    // Compare against bcrypt hash
+    const ansMatch = stored ? await bcrypt.compare(provided, stored) : false;
+    if (!ansMatch) return res.status(401).json({ success: false, error: 'Incorrect answer' });
     const hash = await bcrypt.hash(newPassword, 10);
     db.query('UPDATE students SET password_hash=? WHERE id=?', [hash, rows[0].id], (e2) => {
       if (e2) return res.status(500).json({ success: false, error: 'Failed to reset password' });
@@ -1259,7 +1273,10 @@ app.post('/api/student/forgot-password/reset', async (req, res) => {
    PAYSTACK PUBLIC KEY (for frontend)
 ────────────────────────────────────────────────────────────── */
 app.get('/api/config/paystack-key', (req, res) => {
-  res.json({ key: PAYSTACK_PUBLIC_KEY });
+  if (!PAYSTACK_PUBLIC_KEY) {
+    console.warn('[PAYSTACK] WARNING: PAYSTACK_PUBLIC_KEY env var is not set! Frontend payments will not work.');
+  }
+  res.json({ key: PAYSTACK_PUBLIC_KEY || '' });
 });
 
 
