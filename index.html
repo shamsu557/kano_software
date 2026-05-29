@@ -316,7 +316,8 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
           </ul>
         </li>
       </ul>
-      <a href="/student/apply" class="btn btn-warning fw-bold ms-3 px-4">Enroll Now</a>
+      <a href="/student/apply" class="btn btn-warning fw-bold ms-2 px-4"><i class="fas fa-graduation-cap me-1"></i>Apply</a>
+      <button onclick="openTrackModal()" class="btn btn-outline-light fw-bold ms-2 px-3"><i class="fas fa-credit-card me-1"></i>Pay & Continue</button>
     </div>
   </div>
 </nav>
@@ -336,8 +337,8 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
           <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-warning"></i><span>Live Deployment</span></div>
         </div>
         <div class="d-flex flex-wrap gap-3">
-          <a href="/student/apply" class="btn btn-warning btn-lg fw-bold px-5">Apply Now</a>
-          <a href="#courses" class="btn btn-outline-light btn-lg px-5">Explore Courses</a>
+          <button onclick="openTrackModal()" class="btn btn-warning btn-lg fw-bold px-5"><i class="fas fa-credit-card me-2"></i>Pay Registration Fee & Continue</button>
+          <a href="/student/apply" class="btn btn-outline-light btn-lg px-4"><i class="fas fa-graduation-cap me-2"></i>View Courses &amp; Apply</a>
         </div>
       </div>
       <div class="col-lg-6 text-center">
@@ -698,8 +699,8 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
   <div class="container">
     <h2 class="fw-bold mb-3">Ready to Start Your Journey?</h2>
     <p class="mb-4 fs-5" style="opacity:.9">Join KSRMS Technologies and build real software from day one.</p>
-    <a href="/student/apply" class="btn btn-warning btn-lg fw-bold px-5 me-3">Apply Now</a>
-    <a href="/student/login" class="btn btn-outline-light btn-lg px-5">Student Portal</a>
+    <a href="/student/apply" class="btn btn-warning btn-lg fw-bold px-5 me-3"><i class="fas fa-graduation-cap me-2"></i>View Courses &amp; Apply</a>
+    <button onclick="openTrackModal()" class="btn btn-outline-light btn-lg px-5"><i class="fas fa-credit-card me-2"></i>Pay Registration Fee &amp; Continue</button>
   </div>
 </section>
 
@@ -728,7 +729,8 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
         <div class="d-flex flex-column gap-1">
           <a href="#courses" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Our Courses</a>
           <a href="#requirements" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">PC Requirements</a>
-          <a href="/student/apply" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Apply Now</a>
+          <a href="/student/apply" class="text-decoration-none small" style="color:rgba(255,255,255,.8)"><i class="fas fa-pen me-1"></i>Apply Now</a>
+          <a href="javascript:openTrackModal()" class="text-decoration-none small" style="color:rgba(255,255,255,.8)"><i class="fas fa-credit-card me-1"></i>Pay Registration Fee</a>
           <a href="/student/login" class="text-decoration-none small" style="color:rgba(255,255,255,.8)">Student Portal</a>
         </div>
       </div>
@@ -759,6 +761,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
 <button id="backToTop" class="back-to-top"><i class="fas fa-arrow-up"></i></button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 
 /* ══════════════════════════════════════
@@ -799,7 +802,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.8); }
 })();
 
 /* ── Stats bar helper ── */
-function buildStats(total, active, comingSoon, programmes) {
+function buildStats(total, active, inactive, programmes) {
   document.getElementById('statsBar').innerHTML = `
     <div class="col-6 col-md-3">
       <div class="stat-item">
@@ -810,13 +813,13 @@ function buildStats(total, active, comingSoon, programmes) {
     <div class="col-6 col-md-3">
       <div class="stat-item">
         <div class="stat-num" style="color:var(--green)">${active}</div>
-        <div class="stat-lbl">Now Enrolling</div>
+        <div class="stat-lbl">Active Courses</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="stat-item">
-        <div class="stat-num" style="color:var(--gold)">${comingSoon}</div>
-        <div class="stat-lbl">Coming Soon</div>
+        <div class="stat-num" style="color:var(--gold)">${inactive}</div>
+        <div class="stat-lbl">Inactive Courses</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
@@ -881,8 +884,8 @@ function buildCourseCard(c) {
        </button>`
     : '';
 
-  /* apply URL is course-specific */
-  const applyUrl = `/student/apply?courseId=${c.id}`;
+  /* apply URL — carries all course detail params so application page prefills */
+  const applyUrl = `/student/apply?courseId=${c.id}&courseName=${encodeURIComponent(c.name)}&appFee=${c.application_fee || 0}&regFee=${c.registration_fee || 0}&schedule=${encodeURIComponent(c.schedule || '')}&mode=${encodeURIComponent(c.mode || '')}`;
 
   /* footer — three states */
   let footer;
@@ -1058,5 +1061,484 @@ window.addEventListener('scroll', () => {
 backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
 </script>
+
+<!-- ── MY APPLICATION MODAL ── -->
+<div id="trackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;overflow-y:auto;padding:20px 12px;">
+  <div style="background:#fff;max-width:560px;margin:40px auto;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0D1B5E,#1A56DB);padding:22px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h5 style="color:#fff;margin:0;font-weight:700;font-size:1.1rem;"><i class="fas fa-credit-card me-2"></i>Pay Registration Fee & Continue</h5>
+        <p style="color:rgba(255,255,255,.75);margin:4px 0 0;font-size:.82rem;">Track your application status, pay your registration fee, or continue enrollment</p>
+      </div>
+      <button onclick="closeTrackModal()" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:2px solid #e2e8f0;">
+      <button id="tabTrack" onclick="switchTrackTab('track')"
+        style="flex:1;padding:12px;border:none;background:#fff;font-weight:700;font-size:.88rem;color:#1A56DB;border-bottom:3px solid #1A56DB;cursor:pointer;">
+        <i class="fas fa-search me-1"></i> Track by Email / Phone
+      </button>
+      <button id="tabPay" onclick="switchTrackTab('pay')"
+        style="flex:1;padding:12px;border:none;background:#f8fafc;font-weight:600;font-size:.88rem;color:#64748b;border-bottom:3px solid transparent;cursor:pointer;">
+        <i class="fas fa-credit-card me-1"></i> Pay Registration Fee
+      </button>
+    </div>
+
+    <!-- TAB 1: Track by Email/Phone -->
+    <div id="trackTabContent">
+      <!-- Step 1: Search -->
+      <div id="trackStep1" style="padding:28px;">
+        <label style="font-weight:600;font-size:.9rem;color:#333;display:block;margin-bottom:8px;">Email or Phone Number</label>
+        <input id="trackSearch" type="text" placeholder="e.g. yourname@gmail.com or 08012345678"
+          style="width:100%;padding:11px 14px;border:1.5px solid #d1d5db;border-radius:10px;font-size:.95rem;outline:none;box-sizing:border-box;"
+          onkeydown="if(event.key==='Enter') doTrackSearch()">
+        <button onclick="doTrackSearch()" id="trackSearchBtn"
+          style="margin-top:12px;width:100%;padding:12px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;">
+          <i class="fas fa-search me-2"></i>Look Up My Application
+        </button>
+        <div id="trackError" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#dc2626;font-size:.85rem;"></div>
+      </div>
+
+      <!-- Step 2: Results -->
+      <div id="trackStep2" style="display:none;padding:0 28px 28px;">
+        <!-- Info card -->
+        <div id="trackInfoCard" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px;">
+          <div id="trackInfoContent"></div>
+        </div>
+        <!-- Payment history -->
+        <div id="trackPayHist" style="margin-bottom:18px;"></div>
+        <!-- Downloads -->
+        <div id="trackDownloads" style="margin-bottom:18px;"></div>
+
+        <!-- Main CTA -->
+        <div id="trackCTA"></div>
+        <button onclick="resetTrackModal()" style="margin-top:12px;background:none;border:1.5px solid #d1d5db;border-radius:8px;padding:8px 18px;font-size:.83rem;cursor:pointer;color:#555;">
+          <i class="fas fa-arrow-left me-1"></i>Search Again
+        </button>
+      </div>
+    </div><!-- /trackTabContent -->
+
+    <!-- TAB 2: Direct payment by App/Admission number -->
+    <div id="payTabContent" style="display:none;padding:28px;">
+      <p style="font-size:.88rem;color:#475569;margin-bottom:16px;">
+        Enter your <strong>Application Number</strong> (e.g. <code>APP1234567890</code>) or <strong>Admission Number</strong> to view your details and make a registration payment.
+      </p>
+      <label style="font-weight:600;font-size:.9rem;color:#333;display:block;margin-bottom:8px;">Application / Admission Number</label>
+      <input id="payNumInput" type="text" placeholder="e.g. APP1234567890 or KSR/2025/WEB/001"
+        style="width:100%;padding:11px 14px;border:1.5px solid #d1d5db;border-radius:10px;font-size:.95rem;outline:none;box-sizing:border-box;"
+        onkeydown="if(event.key==='Enter') doPayLookup()">
+      <button onclick="doPayLookup()" id="payLookupBtn"
+        style="margin-top:12px;width:100%;padding:12px;background:#059669;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;">
+        <i class="fas fa-search me-2"></i>Look Up & Proceed to Payment
+      </button>
+      <div id="payLookupError" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#dc2626;font-size:.85rem;"></div>
+
+      <!-- Pay result -->
+      <div id="payResult" style="display:none;margin-top:20px;">
+        <div id="payStudentInfo" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:14px;"></div>
+        <div id="payPartialLinks" style="margin-bottom:10px;"></div>
+        <div id="payHistSection" style="margin-bottom:14px;"></div>
+        <h6 style="font-weight:700;color:#0D1B5E;font-size:.9rem;margin-bottom:10px;"><i class="fas fa-credit-card me-2"></i>Select Payment Option</h6>
+        <div id="payOptions" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;"></div>
+        <button id="payNowBtn" onclick="startDirectPayment()" style="display:none;width:100%;padding:13px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;">
+          <i class="fas fa-lock me-2"></i>Pay Securely via Paystack
+        </button>
+        <div id="payFullyPaidMsg" style="display:none;padding:14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;text-align:center;">
+          <i class="fas fa-check-circle" style="color:#059669;font-size:1.5rem;margin-bottom:6px;display:block;"></i>
+          <strong style="color:#059669;">Registration Fully Paid!</strong>
+          <p style="font-size:.83rem;color:#475569;margin:4px 0 10px;">You have completed your registration payment.</p>
+          <div id="payFullyPaidLinks"></div>
+        </div>
+      </div>
+    </div><!-- /payTabContent -->
+
+  </div>
+</div>
+
+<script>
+/* ── My Application Modal ── */
+let _directPayData = null;  // stores student data for direct payment tab
+let _directPayType = null;  // 'full' | 'first' | 'second'
+let _paystackKey   = '';
+
+// Fetch Paystack key on load
+fetch('/api/config/paystack-key').then(r => r.json()).then(d => { _paystackKey = d.key || ''; }).catch(() => {});
+
+function openTrackModal() {
+  document.getElementById('trackModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeTrackModal() {
+  document.getElementById('trackModal').style.display = 'none';
+  document.body.style.overflow = '';
+  resetTrackModal();
+}
+function resetTrackModal() {
+  document.getElementById('trackStep1').style.display = 'block';
+  document.getElementById('trackStep2').style.display = 'none';
+  document.getElementById('trackSearch').value = '';
+  document.getElementById('trackError').style.display = 'none';
+}
+document.getElementById('trackModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTrackModal();
+});
+
+function switchTrackTab(tab) {
+  const isTrack = tab === 'track';
+  document.getElementById('trackTabContent').style.display = isTrack ? '' : 'none';
+  document.getElementById('payTabContent').style.display   = isTrack ? 'none' : '';
+  document.getElementById('tabTrack').style.cssText = isTrack
+    ? 'flex:1;padding:12px;border:none;background:#fff;font-weight:700;font-size:.88rem;color:#1A56DB;border-bottom:3px solid #1A56DB;cursor:pointer;'
+    : 'flex:1;padding:12px;border:none;background:#f8fafc;font-weight:600;font-size:.88rem;color:#64748b;border-bottom:3px solid transparent;cursor:pointer;';
+  document.getElementById('tabPay').style.cssText = !isTrack
+    ? 'flex:1;padding:12px;border:none;background:#fff;font-weight:700;font-size:.88rem;color:#059669;border-bottom:3px solid #059669;cursor:pointer;'
+    : 'flex:1;padding:12px;border:none;background:#f8fafc;font-weight:600;font-size:.88rem;color:#64748b;border-bottom:3px solid transparent;cursor:pointer;';
+}
+
+async function doTrackSearch() {
+  const search = document.getElementById('trackSearch').value.trim();
+  const errEl  = document.getElementById('trackError');
+  errEl.style.display = 'none';
+  if (!search) { errEl.textContent = 'Please enter your email or phone number.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('trackSearchBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Searching…'; btn.disabled = true;
+
+  try {
+    const res  = await fetch(`/api/track-application?search=${encodeURIComponent(search)}`);
+    const data = await res.json();
+    btn.innerHTML = '<i class="fas fa-search me-2"></i>Look Up My Application'; btn.disabled = false;
+
+    if (!data.success) {
+      errEl.textContent = data.error || 'No record found with that email or phone.';
+      errEl.style.display = 'block';
+      return;
+    }
+    renderTrackResults(data);
+  } catch(e) {
+    btn.innerHTML = '<i class="fas fa-search me-2"></i>Look Up My Application'; btn.disabled = false;
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
+  }
+}
+
+function renderTrackResults(data) {
+  const s = data.student;
+  const payments = data.payments || [];
+  const regPays  = payments.filter(p => p.payment_type === 'Registration Fee' && p.status === 'Completed');
+  const totalRegPaid = regPays.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+  const regFee   = Number(s.registration_fee || 0);
+  const fullyPaid = regFee > 0 && totalRegPaid >= regFee;
+  const hasAdm   = !!s.admission_number;
+  const hasApp   = !!s.application_number;
+
+  const row = (label, val, color) =>
+    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:.87rem;">
+      <span style="color:#64748b;font-weight:500;">${label}</span>
+      <span style="color:${color||'#1e293b'};font-weight:600;">${val||'—'}</span>
+    </div>`;
+
+  document.getElementById('trackInfoContent').innerHTML =
+    row('Name', s.first_name + ' ' + s.last_name) +
+    row('Course', s.course_name) +
+    row('Mode', s.mode) +
+    row('Status', s.status) +
+    (hasApp ? row('Application No.', s.application_number, '#1A56DB') : '') +
+    (hasAdm ? row('Admission No.',   s.admission_number,   '#059669') : '') +
+    (regFee > 0 ? row('Registration Fee', '₦' + regFee.toLocaleString()) : '') +
+    (regFee > 0 ? row('Amount Paid', '₦' + totalRegPaid.toLocaleString(), fullyPaid ? '#059669' : '#d97706') : '') +
+    (fullyPaid ? row('Payment Status', '✅ Fully Paid', '#059669') :
+      totalRegPaid > 0 ? row('Payment Status', `Partial — ₦${(regFee - totalRegPaid).toLocaleString()} remaining`, '#d97706') :
+      row('Payment Status', 'Unpaid', '#dc2626'));
+
+  let histHtml = '';
+  if (regPays.length) {
+    histHtml = `<h6 style="font-size:.82rem;font-weight:700;color:#475569;margin-bottom:8px;"><i class="fas fa-receipt me-1"></i>Payment History</h6>`;
+    regPays.forEach(p => {
+      const lbl = p.installment_type && p.installment_type !== 'full'
+        ? `Registration (${p.installment_type} installment)`
+        : 'Registration (full payment)';
+      histHtml += `<div style="display:flex;justify-content:space-between;padding:7px 10px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0;margin-bottom:5px;font-size:.83rem;">
+        <span>${lbl}</span>
+        <strong style="color:#059669;">₦${Number(p.amount).toLocaleString()}</strong>
+      </div>`;
+    });
+  }
+  document.getElementById('trackPayHist').innerHTML = histHtml;
+
+  let dlHtml = '<p style="font-size:.8rem;font-weight:700;color:#475569;margin:0 0 8px;"><i class="fas fa-download me-1"></i>Your Documents</p>';
+  if (hasApp) {
+    dlHtml += `<a href="/api/download/application-form/${s.application_number}" target="_blank"
+      style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:.82rem;font-weight:600;color:#1A56DB;text-decoration:none;margin-right:8px;margin-bottom:6px;">
+      <i class="fas fa-file-pdf"></i> Application Form
+    </a>`;
+  }
+  if (hasAdm && totalRegPaid > 0) {
+    dlHtml += `<a href="/api/download/admission-letter?num=${encodeURIComponent(s.admission_number)}" target="_blank"
+      style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;font-size:.82rem;font-weight:600;color:#059669;text-decoration:none;margin-right:8px;margin-bottom:6px;">
+      <i class="fas fa-file-alt"></i> Admission Letter
+    </a>`;
+  } else if (hasAdm && totalRegPaid === 0) {
+    dlHtml += `<span style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:8px;font-size:.82rem;color:#94a3b8;margin-right:8px;margin-bottom:6px;">
+      <i class="fas fa-lock"></i> Admission Letter (pay registration fee to unlock)
+    </span>`;
+  }
+  if (hasAdm && totalRegPaid > 0) {
+    dlHtml += `<a href="/api/receipt/download/public?admissionNum=${encodeURIComponent(s.admission_number)}" target="_blank"
+      style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fefce8;border:1.5px solid #fde68a;border-radius:8px;font-size:.82rem;font-weight:600;color:#92400e;text-decoration:none;margin-bottom:6px;">
+      <i class="fas fa-receipt"></i> Payment Receipt
+    </a>`;
+  }
+  document.getElementById('trackDownloads').innerHTML = dlHtml;
+
+  /* ── CTA block — what should the user do next? ── */
+  let ctaHtml = '';
+  const num = s.application_number || s.admission_number || '';
+
+  if (!hasApp && !hasAdm) {
+    ctaHtml = `<div style="padding:12px 14px;background:#fef2f2;border-radius:10px;font-size:.87rem;color:#dc2626;">
+      No application fee payment found yet. Please <a href="#courses" onclick="closeTrackModal()">apply for a course</a> first.
+    </div>`;
+  } else if (!fullyPaid) {
+    const ctaLabel = totalRegPaid > 0
+      ? '💳 Pay 2nd Installment — Clear Your Balance'
+      : '💳 Proceed to Registration Payment';
+    ctaHtml = `
+      <a href="/student/register?${hasAdm ? 'admissionNumber' : 'appNumber'}=${encodeURIComponent(num)}"
+        style="display:block;text-align:center;padding:13px;background:#1A56DB;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem;">
+        ${ctaLabel}
+      </a>
+      <p style="text-align:center;font-size:.78rem;color:#94a3b8;margin-top:6px;">
+        You'll be taken to the secure registration portal to ${totalRegPaid > 0 ? 'pay the remaining balance' : 'pay your registration fee'}
+      </p>`;
+  } else if (hasAdm && !s.hasPassword) {
+    ctaHtml = `
+      <a href="/student/register?admissionNumber=${encodeURIComponent(s.admission_number)}"
+        style="display:block;text-align:center;padding:13px;background:#059669;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem;">
+        ✅ Complete Security Setup &amp; Upload Documents
+      </a>`;
+  } else if (hasAdm) {
+    ctaHtml = `
+      <a href="/student/login"
+        style="display:block;text-align:center;padding:13px;background:#059669;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem;">
+        <i class="fas fa-sign-in-alt me-2"></i>Login to Student Portal
+      </a>`;
+  }
+  document.getElementById('trackCTA').innerHTML = ctaHtml;
+
+  document.getElementById('trackStep1').style.display = 'none';
+  document.getElementById('trackStep2').style.display = 'block';
+}
+
+/* ── Pay Tab: lookup by app/admission number ── */
+async function doPayLookup() {
+  const num    = document.getElementById('payNumInput').value.trim();
+  const errEl  = document.getElementById('payLookupError');
+  errEl.style.display = 'none';
+  document.getElementById('payResult').style.display = 'none';
+  if (!num) { errEl.textContent = 'Please enter your Application or Admission Number.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('payLookupBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Looking up…'; btn.disabled = true;
+
+  try {
+    const res  = await fetch(`/api/student/verify-application/${encodeURIComponent(num)}`);
+    const data = await res.json();
+    btn.innerHTML = '<i class="fas fa-search me-2"></i>Look Up & Proceed to Payment'; btn.disabled = false;
+
+    if (!data.success) {
+      errEl.textContent = data.error || 'No record found. Please check your number.';
+      errEl.style.display = 'block';
+      return;
+    }
+    _directPayData = data.student;
+    _directPayData._payments = data.payments || [];
+    renderDirectPaySection();
+  } catch(e) {
+    btn.innerHTML = '<i class="fas fa-search me-2"></i>Look Up & Proceed to Payment'; btn.disabled = false;
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
+  }
+}
+
+function renderDirectPaySection() {
+  const s       = _directPayData;
+  const regFee  = Number(s.registration_fee || 0);
+  const paid    = Number(s.totalPaid || 0);
+  const regPays = (s._payments || []).filter(p => p.payment_type === 'Registration Fee');
+  const installNum = Number(s.installmentNumber || 0);
+  const firstAmt   = Math.ceil(regFee / 2);
+  const secondAmt  = regFee - firstAmt;
+  const fullyPaid  = regFee > 0 && paid >= regFee;
+
+  const row = (l, v, c) => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:.84rem;">
+    <span style="color:#64748b;font-weight:500;">${l}</span><span style="color:${c||'#1e293b'};font-weight:600;">${v||'—'}</span></div>`;
+
+  const paidStatus = fullyPaid
+    ? '<span style="color:#059669;font-weight:700;">✅ Fully Paid</span>'
+    : paid > 0
+      ? `<span style="color:#d97706;font-weight:700;">Partial — ₦${(regFee - paid).toLocaleString()} remaining</span>`
+      : '<span style="color:#dc2626;font-weight:700;">Unpaid</span>';
+
+  document.getElementById('payStudentInfo').innerHTML =
+    row('Name', s.first_name + ' ' + s.last_name) +
+    row('Course', s.course_name) +
+    (s.application_number ? row('Application No.', s.application_number, '#1A56DB') : '') +
+    (s.admission_number   ? row('Admission No.',   s.admission_number,   '#059669') : '') +
+    row('Registration Fee', '₦' + regFee.toLocaleString()) +
+    row('Amount Paid', '₦' + paid.toLocaleString(), fullyPaid ? '#059669' : '#d97706') +
+    `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:.84rem;">
+      <span style="color:#64748b;font-weight:500;">Payment Status</span><span>${paidStatus}</span></div>`;
+
+  // Payment history
+  let histHtml = '';
+  if (regPays.length) {
+    histHtml = `<p style="font-size:.78rem;font-weight:700;color:#475569;margin:0 0 6px;"><i class="fas fa-receipt me-1"></i>Payments Made</p>`;
+    regPays.forEach(p => {
+      const lbl = p.installment_type && p.installment_type !== 'full'
+        ? `Reg. Fee (${p.installment_type} installment)`
+        : 'Reg. Fee (full)';
+      histHtml += `<div style="display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0;margin-bottom:4px;font-size:.8rem;">
+        <span>${lbl} <span style="color:#94a3b8;">${new Date(p.payment_date).toLocaleDateString('en-GB')}</span></span>
+        <strong style="color:#059669;">₦${Number(p.amount).toLocaleString()}</strong></div>`;
+    });
+  }
+  document.getElementById('payHistSection').innerHTML = histHtml;
+
+  const optionsEl    = document.getElementById('payOptions');
+  const payNowBtn    = document.getElementById('payNowBtn');
+  const fullyPaidMsg = document.getElementById('payFullyPaidMsg');
+
+  if (fullyPaid) {
+    optionsEl.style.display    = 'none';
+    payNowBtn.style.display    = 'none';
+    fullyPaidMsg.style.display = 'block';
+    document.getElementById('payPartialLinks').innerHTML = '';
+    let linksHtml = '';
+    if (s.application_number) {
+      linksHtml += `<a href="/api/download/application-form/${s.application_number}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:.82rem;font-weight:600;color:#1A56DB;text-decoration:none;margin:3px;">
+        <i class="fas fa-file-pdf"></i> Application Form</a>`;
+    }
+    if (s.admission_number) {
+      linksHtml += `<a href="/api/download/admission-letter?num=${encodeURIComponent(s.admission_number)}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;font-size:.82rem;font-weight:600;color:#059669;text-decoration:none;margin:3px;">
+        <i class="fas fa-file-alt"></i> Admission Letter</a>`;
+      linksHtml += `<a href="/api/receipt/download/public?admissionNum=${encodeURIComponent(s.admission_number)}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:#fefce8;border:1.5px solid #fde68a;border-radius:8px;font-size:.82rem;font-weight:600;color:#92400e;text-decoration:none;margin:3px;">
+        <i class="fas fa-receipt"></i> Payment Receipt</a>`;
+    }
+    document.getElementById('payFullyPaidLinks').innerHTML = linksHtml;
+  } else {
+    fullyPaidMsg.style.display = 'none';
+    optionsEl.style.display    = 'flex';
+    payNowBtn.style.display    = 'none';
+    _directPayType = null;
+
+    // Show download links even in partial/unpaid state
+    let partialLinks = '';
+    if (s.application_number) {
+      partialLinks += `<a href="/api/download/application-form/${s.application_number}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:.8rem;font-weight:600;color:#1A56DB;text-decoration:none;margin:3px 3px 10px 0;">
+        <i class="fas fa-file-pdf"></i> Application Form</a>`;
+    }
+    if (s.admission_number && paid > 0) {
+      partialLinks += `<a href="/api/download/admission-letter?num=${encodeURIComponent(s.admission_number)}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;font-size:.8rem;font-weight:600;color:#059669;text-decoration:none;margin:3px 3px 10px 0;">
+        <i class="fas fa-file-alt"></i> Admission Letter</a>`;
+    } else if (s.admission_number && paid === 0) {
+      partialLinks += `<span style="display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:8px;font-size:.8rem;color:#94a3b8;margin:3px 3px 10px 0;">
+        <i class="fas fa-lock"></i> Admission Letter — unlocks after first payment</span>`;
+    }
+    if (partialLinks) {
+      document.getElementById('payPartialLinks').innerHTML = partialLinks;
+    } else {
+      document.getElementById('payPartialLinks').innerHTML = '';
+    }
+
+    const mkCard = (type, icon, label, amt, note, color) =>
+      `<div id="dpCard-${type}" onclick="selectDirectPay('${type}')"
+        style="flex:1;min-width:130px;border:2px solid #e2e8f0;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:.2s;background:#fff;">
+        <i class="fas ${icon}" style="font-size:1.5rem;color:${color};margin-bottom:6px;display:block;"></i>
+        <div style="font-weight:700;font-size:.88rem;color:#0D1B5E;margin-bottom:3px;">${label}</div>
+        <div style="font-size:1rem;font-weight:800;color:${color};">₦${amt.toLocaleString()}</div>
+        <div style="font-size:.72rem;color:#94a3b8;margin-top:3px;">${note}</div>
+      </div>`;
+
+    if (installNum === 1) {
+      // Only 2nd installment
+      optionsEl.innerHTML = mkCard('second', 'fa-calendar-check', '2nd Installment', secondAmt, 'Clears your balance', '#059669');
+    } else {
+      // No payment yet — full or 1st
+      optionsEl.innerHTML =
+        mkCard('full',  'fa-money-bill-wave', 'Full Payment',    regFee,    'Pay once & complete', '#059669') +
+        mkCard('first', 'fa-calendar-alt',    '1st Installment', firstAmt,  '50% now, rest later', '#1A56DB');
+    }
+  }
+
+  document.getElementById('payResult').style.display = 'block';
+}
+
+function selectDirectPay(type) {
+  _directPayType = type;
+  document.querySelectorAll('[id^="dpCard-"]').forEach(c => {
+    c.style.borderColor = '#e2e8f0';
+    c.style.background  = '#fff';
+  });
+  const card = document.getElementById(`dpCard-${type}`);
+  if (card) { card.style.borderColor = '#1A56DB'; card.style.background = '#eff6ff'; }
+  document.getElementById('payNowBtn').style.display = 'block';
+}
+
+async function startDirectPayment() {
+  if (!_directPayType || !_directPayData) return;
+  const s        = _directPayData;
+  const regFee   = Number(s.registration_fee || 0);
+  const firstAmt = Math.ceil(regFee / 2);
+  const secondAmt = regFee - firstAmt;
+  const amount = _directPayType === 'full' ? regFee : _directPayType === 'first' ? firstAmt : secondAmt;
+  const appNum = s.application_number || s.admission_number;
+
+  const handler = PaystackPop.setup({
+    key:      'pk_live_661e479efe8cccc078d6e6c078a5b6e0dc963079',
+    email:    s.email,
+    amount:   Math.round(amount * 100),
+    currency: 'NGN',
+    ref:      `REG-${Date.now()}-${Math.random().toString(36).substr(2,6).toUpperCase()}`,
+    metadata: { custom_fields: [
+      { display_name: 'App/Admission No', variable_name: 'app_number', value: appNum || '' },
+      { display_name: 'Installment Type', variable_name: 'installment_type', value: _directPayType },
+    ]},
+    callback: async (response) => {
+      document.getElementById('payNowBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying…';
+      document.getElementById('payNowBtn').disabled = true;
+      try {
+        const res = await fetch('/api/payment/verify-registration', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reference: response.reference, applicationNumber: appNum, installmentType: _directPayType }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Verification failed');
+        // Refresh
+        const r2 = await fetch(`/api/student/verify-application/${encodeURIComponent(appNum)}`);
+        const d2 = await r2.json();
+        if (d2.success) { _directPayData = d2.student; _directPayData._payments = d2.payments || []; }
+        if (data.admissionNumber) _directPayData.admission_number = data.admissionNumber;
+        renderDirectPaySection();
+        alert(_directPayType === 'full' || _directPayType === 'second'
+          ? '✅ Payment complete! Your registration is fully paid. Download your receipt below.'
+          : '✅ 1st installment paid! You can pay the balance anytime from this screen.');
+      } catch(err) {
+        alert('Payment verification failed: ' + err.message);
+        document.getElementById('payNowBtn').innerHTML = '<i class="fas fa-lock me-2"></i>Pay Securely via Paystack';
+        document.getElementById('payNowBtn').disabled = false;
+      }
+    },
+    onClose: () => {},
+  });
+  handler.openIframe();
+}
+</script>
 </body>
-</html>

@@ -388,7 +388,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data.success) {
       staffCountEl.textContent   = data.staff    || 0;
       studentCountEl.textContent = data.students || 0;
-      courseCountEl.textContent  = data.courses  || 0;
+      courseCountEl.textContent  = data.courses || 0;
+      const activeEl   = document.getElementById('course-active-count');
+      const inactiveEl = document.getElementById('course-inactive-count');
+      if (activeEl)   activeEl.textContent   = `${data.activeCourses   || 0} Active`;
+      if (inactiveEl) inactiveEl.textContent = `${data.inactiveCourses || 0} Inactive`;
     } else {
       console.error('Failed to fetch dashboard data:', data.error);
       alert('Failed to load dashboard data. Please try again.');

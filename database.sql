@@ -78,6 +78,7 @@ CREATE TABLE courses (
     schedule VARCHAR(100),
     application_fee DECIMAL(10,2) DEFAULT 0,
     registration_fee DECIMAL(10,2) DEFAULT 0,
+    session_times JSON DEFAULT NULL,           -- e.g. ["10:00-12:00","12:00-15:00"]
     certification_type VARCHAR(100) DEFAULT 'Certificate',
     is_active TINYINT(1) DEFAULT 1,
     image_path VARCHAR(255),
@@ -190,6 +191,10 @@ CREATE TABLE students (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
     admission_number VARCHAR(100) UNIQUE,
+    application_number VARCHAR(100) UNIQUE,
+    is_first_login TINYINT(1) DEFAULT 1,
+    security_question VARCHAR(255),
+    security_answer VARCHAR(255),
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     email VARCHAR(150) UNIQUE,
@@ -243,6 +248,9 @@ CREATE TABLE payments (
     student_id INT UNSIGNED,
     payment_type VARCHAR(100),
     amount DECIMAL(10,2),
+    installment_type VARCHAR(20) DEFAULT 'full',
+    reference_number VARCHAR(100),
+    paystack_reference VARCHAR(100),
 
     status ENUM('pending','Completed','Failed') DEFAULT 'pending',
 

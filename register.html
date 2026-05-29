@@ -1,299 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration - KSRMS Technologies</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/global.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration — KSRMS Technologies</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/global.css">
+  <style>
+    body { background: #f0f4f8; }
+    .reg-card { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(13,27,94,.12); }
+    .reg-header { background: linear-gradient(135deg,#0D1B5E,#1A56DB); padding: 28px 32px; }
+    .step-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+    .step-pill { font-size: .72rem; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
+    .step-pill.active { background: #fff; color: #0D1B5E; }
+    .step-pill.done { background: rgba(255,255,255,.4); color: #fff; }
+    .registration-step { display: none; }
+    .registration-step.active { display: block; }
+    .payment-card { border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: .2s; }
+    .payment-card:hover { border-color: #1A56DB; box-shadow: 0 4px 18px rgba(26,86,219,.12); }
+    .payment-card.selected { border-color: #1A56DB; background: #eff6ff; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: .9rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #64748b; font-weight: 500; }
+    .info-val { color: #1e293b; font-weight: 600; }
+    .pay-hist-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 6px; font-size: .87rem; }
+    .badge-paid { background: #dcfce7; color: #166534; font-size: .72rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .progress-steps { display: flex; align-items: center; margin-bottom: 28px; }
+    .ps-item { flex: 1; text-align: center; position: relative; }
+    .ps-item:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: 60%; width: 80%; height: 2px; background: #e2e8f0; z-index: 0; }
+    .ps-item.done:not(:last-child)::after { background: #1A56DB; }
+    .ps-num { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; font-size: .78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; position: relative; z-index: 1; }
+    .ps-item.active .ps-num { background: #1A56DB; color: #fff; }
+    .ps-item.done .ps-num { background: #059669; color: #fff; }
+    .ps-label { font-size: .68rem; color: #94a3b8; font-weight: 500; }
+    .ps-item.active .ps-label { color: #1A56DB; font-weight: 700; }
+    .ps-item.done .ps-label { color: #059669; }
+  </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="/ksrms_logo.png" alt="KSRMS Technologies" style="height:38px;width:38px;object-fit:contain;border-radius:50%;background:#fff;padding:2px;margin-right:8px;"><span>KSRMS Technologies</span>
-            </a>
-            <div class="ms-auto">
-                <button class="btn btn-primary text-white" onclick="window.location.href='/'" aria-label="Back to Home">
-                    Back to Home
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/ksrms_logo.png" alt="KSRMS" style="height:38px;width:38px;object-fit:contain;border-radius:50%;background:#fff;padding:2px;margin-right:8px;">
+        <span>KSRMS Technologies</span>
+      </a>
+      <div class="ms-auto">
+        <button class="btn btn-outline-light btn-sm" onclick="window.location.href='/'">
+          <i class="fas fa-home me-1"></i>Home
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5 pt-4 pb-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <div class="reg-card bg-white">
+          <!-- Header -->
+          <div class="reg-header">
+            <div class="step-pills" id="stepPills"></div>
+            <h4 class="text-white fw-bold mb-0 mt-2" id="stepTitle">Student Registration Portal</h4>
+            <p class="text-white-50 mb-0 small" id="stepSubtitle">Enter your Application Number to begin</p>
+          </div>
+
+          <div class="p-4">
+            <!-- Alert -->
+            <div id="alertBox"></div>
+
+            <!-- Progress bar -->
+            <div class="progress-steps mb-4" id="progressSteps">
+              <div class="ps-item active" id="ps1">
+                <div class="ps-num">1</div>
+                <div class="ps-label">Verify</div>
+              </div>
+              <div class="ps-item" id="ps2">
+                <div class="ps-num">2</div>
+                <div class="ps-label">Payment</div>
+              </div>
+              <div class="ps-item" id="ps3">
+                <div class="ps-num">3</div>
+                <div class="ps-label">Security</div>
+              </div>
+              <div class="ps-item" id="ps4">
+                <div class="ps-num">4</div>
+                <div class="ps-label">Qualifications</div>
+              </div>
+            </div>
+
+            <!-- ─── STEP 1: Verify ─────────────────────────── -->
+            <div class="registration-step active" id="step1">
+              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-search text-primary me-2"></i>Step 1: Verify Your Number</h6>
+              <form id="verifyApplicationForm" novalidate>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Application Number or Admission Number <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="applicationNumber"
+                    placeholder="e.g. APP1234567890 or KSR/2025/WEB/001" required
+                    style="border-radius:10px;padding:10px 14px;">
+                  <div class="form-text">Enter your Application Number (from after paying the application fee) or your Admission Number if you already have one.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius:10px;">
+                  <i class="fas fa-search me-2"></i>Verify & Continue
                 </button>
+              </form>
             </div>
-        </div>
-    </nav>
 
-    <div class="container mt-5 pt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow-lg">
-                    <div class="card-header bg-success text-white text-center">
-                        <h3><i class="fas fa-user-check me-2"></i>Student Registration</h3>
-                        <p class="mb-0" id="stepHeader">Step 1: Verify your application or admission number</p>
-                    </div>
-                    <div class="card-body p-4">
-                        <!-- Bootstrap Alert Box -->
-                        <div id="alertBox"></div>
-                        
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle me-2"></i>Registration Process Guide:</h6>
-                            <ol class="mb-0">
-                                <li id="step1Guide">Verify your application or admission number</li>
-                                <li id="step2Guide">Pay the registration fee (full or in two installments)</li>
-                                <li id="step3Guide">Set up your security question for password recovery</li>
-                                <li id="step4Guide">Upload your highest qualification document</li>
-                                <li>Receive your admission number and admission letter</li>
-                            </ol>
-                        </div>
+            <!-- ─── STEP 2: Payment ───────────────────────── -->
+            <div class="registration-step" id="step2">
+              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-credit-card text-primary me-2"></i>Step 2: Registration Fee Payment</h6>
 
-                        <div id="step1" class="registration-step">
-                            <h5><i class="fas fa-search me-2"></i>Step 1: Verify Application</h5>
-                            <form id="verifyApplicationForm" novalidate>
-                                <div class="mb-3">
-                                    <label for="verifyType" class="form-label">Select Verification Type <span class="text-danger">*</span></label>
-                                    <select class="form-select form-control-custom" id="verifyType" required aria-label="Select Verification Type" aria-describedby="verifyTypeHelp">
-                                        <option value="application">Application Number</option>
-                                        <option value="admission">Admission Number</option>
-                                    </select>
-                                    <div id="verifyTypeHelp" class="form-text">Choose whether to verify using your application or admission number.</div>
-                                    <div class="invalid-feedback">Please select a verification type.</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="applicationNumber" class="form-label">Enter Number <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-custom" id="applicationNumber" 
-                                           placeholder="Enter Application or Admission Number" required aria-label="Application or Admission Number" aria-describedby="applicationNumberHelp">
-                                    <div id="applicationNumberHelp" class="form-text">Enter your application number for initial verification or admission number for payment status.</div>
-                                    <div class="invalid-feedback">Please enter a valid application or admission number.</div>
-                                </div>
-                                <button type="submit" class="btn btn-primary" aria-label="Verify Application">
-                                    <i class="fas fa-search me-2"></i>Verify
-                                </button>
-                            </form>
-                        </div>
+              <!-- Student info -->
+              <div class="bg-light rounded-3 p-3 mb-4" id="studentDetails"></div>
 
-                        <div id="step2" class="registration-step" style="display: none;">
-                            <h5><i class="fas fa-credit-card me-2"></i>Step 2: Registration Payment</h5>
-                            <div class="student-info mb-4 p-3 bg-light rounded">
-                                <h6>Application Details:</h6>
-                                <div id="studentDetails"></div>
-                            </div>
-                            <div class="payment-options">
-                                <h6>Click Payment Option Then Proceed:</h6>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <div id="fullPaymentCard" class="card payment-card" onclick="selectPayment('full')" role="button" aria-label="Select Full Payment">
-                                            <div class="card-body text-center">
-                                                <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
-                                                <h6>Full Payment</h6>
-                                                <h4 class="text-success" id="fullPaymentAmount">₦0</h4>
-                                                <p class="text-muted">Pay once and complete registration</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div id="installmentCard" class="card payment-card" onclick="selectPayment('installment')" role="button" aria-label="Select Installment Payment">
-                                            <div class="card-body text-center">
-                                                <i class="fas fa-calendar-alt fa-2x text-primary mb-2"></i>
-                                                <h6>Installment Payment</h6>
-                                                <h4 class="text-primary" id="installmentAmount">₦0</h4>
-                                                <p class="text-muted">Pay in two installments</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button id="proceedPayment" class="btn btn-success btn-lg w-100" style="display: none;" onclick="processPayment()" aria-label="Proceed to Payment">
-                                    Proceed to Payment
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="step3" class="registration-step" style="display: none;">
-                            <h5><i class="fas fa-shield-alt me-2"></i>Step 3: Security Setup</h5>
-                            <form id="securityForm" novalidate>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Create Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control form-control-custom" id="password" required aria-label="Create Password" aria-describedby="passwordHelp">
-                                    <div id="passwordHelp" class="form-text">Minimum 8 characters with letters and numbers.</div>
-                                    <div class="invalid-feedback">Please enter a password (minimum 8 characters with letters and numbers).</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control form-control-custom" id="confirmPassword" required aria-label="Confirm Password">
-                                    <div class="invalid-feedback">Please confirm your password.</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="securityQuestion" class="form-label">Security Question <span class="text-danger">*</span></label>
-                                    <select class="form-select form-control-custom" id="securityQuestion" required aria-label="Select Security Question" aria-describedby="securityQuestionHelp">
-                                        <option value="">Select a security question</option>
-                                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                                        <option value="What was the name of your first pet?">What was the name of your first pet?</option>
-                                        <option value="What city were you born in?">What city were you born in?</option>
-                                        <option value="What is your favorite food?">What is your favorite food?</option>
-                                        <option value="What was your first school's name?">What was your first school's name?</option>
-                                    </select>
-                                    <div id="securityQuestionHelp" class="form-text">This will be used for password recovery.</div>
-                                    <div class="invalid-feedback">Please select a security question.</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="securityAnswer" class="form-label">Security Answer <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-custom" id="securityAnswer" required aria-label="Security Answer" aria-describedby="securityAnswerHelp">
-                                    <div id="securityAnswerHelp" class="form-text">Provide an answer for password recovery.</div>
-                                    <div class="invalid-feedback">Please enter a security answer.</div>
-                                </div>
-                                <button type="submit" class="btn btn-primary-custom" aria-label="Continue to Document Upload">
-                                    <i class="fas fa-arrow-right me-2"></i>Continue to Document Upload
-                                </button>
-                            </form>
-                        </div>
-
-                        <div id="step4" class="registration-step" style="display: none;">
-                            <h5><i class="fas fa-upload me-2"></i>Step 4: Document Upload</h5>
-                            <form id="documentForm" enctype="multipart/form-data" novalidate>
-                                <div class="mb-4">
-                                    <label for="highestQualification" class="form-label">Highest Qualification <span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control form-control-custom" id="highestQualification" 
-                                           accept=".pdf,.jpg,.jpeg,.png,.jfif" required aria-label="Upload Highest Qualification" aria-describedby="highestQualificationHelp">
-                                    <div id="highestQualificationHelp" class="form-text">Upload your highest educational qualification (PDF, JPG, PNG).</div>
-                                    <div class="invalid-feedback">Please upload your highest qualification.</div>
-                                </div>
-                               
-                                <button type="submit" class="btn btn-success btn-lg w-100" aria-label="Complete Registration">
-                                    <i class="fas fa-check me-2"></i>Complete Registration
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+              <!-- ─── Download action bar (shown after verify) ─── -->
+              <div id="downloadActionBar" style="display:none;" class="mb-4">
+                <h6 class="fw-semibold text-dark mb-2" style="font-size:.88rem;">
+                  <i class="fas fa-file-download text-primary me-2"></i>Your Documents
+                </h6>
+                <div class="d-flex flex-wrap gap-2">
+                  <!-- Application form — always available once student found -->
+                  <button id="dlAppFormBtn" class="btn btn-outline-primary btn-sm" onclick="downloadApplicationForm()">
+                    <i class="fas fa-file-alt me-1"></i>Download Application Form
+                  </button>
+                  <!-- Admission letter — only if ≥1 registration payment made -->
+                  <button id="dlAdmLetterBtn" class="btn btn-outline-success btn-sm" style="display:none;" onclick="downloadAdmissionLetterStep2()">
+                    <i class="fas fa-graduation-cap me-1"></i>Download Admission Letter
+                  </button>
                 </div>
+                <div id="dlAdmLockNote" class="mt-2" style="display:none;">
+                  <small class="text-muted"><i class="fas fa-lock me-1"></i>Admission Letter will be available after your first registration payment.</small>
+                </div>
+              </div>
+
+              <!-- Payment history -->
+              <div id="paymentHistorySection" style="display:none;" class="mb-4">
+                <h6 class="fw-semibold text-dark mb-2" style="font-size:.88rem;"><i class="fas fa-receipt text-success me-2"></i>Payments Made So Far</h6>
+                <div id="paymentHistoryList"></div>
+              </div>
+
+              <!-- Payment options -->
+              <div id="paymentOptions">
+                <h6 class="fw-semibold text-dark mb-3" style="font-size:.9rem;">Select Payment Option</h6>
+                <div class="row g-3 mb-3" id="paymentCards"></div>
+                <button id="proceedPayment" class="btn btn-success btn-lg w-100 py-2" style="border-radius:10px;display:none;">
+                  <i class="fas fa-lock me-2"></i>Pay Securely via Paystack
+                </button>
+              </div>
+
+              <div id="paymentComplete" style="display:none;" class="text-center py-3">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h6 class="fw-bold text-success">Registration Fee Fully Paid!</h6>
+                <p class="text-muted small mb-3">You can download your payment receipt below.</p>
+                <a id="receiptDownloadLink" href="#" target="_blank" class="btn btn-outline-success btn-sm me-2">
+                  <i class="fas fa-download me-1"></i>Download Receipt
+                </a>
+                <button class="btn btn-primary btn-sm" onclick="showStep(3)">
+                  Continue to Security Setup <i class="fas fa-arrow-right ms-1"></i>
+                </button>
+              </div>
             </div>
-        </div>
+
+            <!-- ─── STEP 3: Security ──────────────────────── -->
+            <div class="registration-step" id="step3">
+              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-shield-alt text-primary me-2"></i>Step 3: Set Up Your Password & Security Question</h6>
+              <p class="text-muted small mb-4">Your <strong>Admission Number</strong> is your initial username. Set a new password and a security question — the answer will be stored in UPPERCASE and used if you ever forget your password.</p>
+              <form id="securityForm" novalidate>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">New Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="password" required placeholder="Min 8 chars, letters and numbers"
+                    style="border-radius:10px;padding:10px 14px;">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="confirmPassword" required placeholder="Re-enter password"
+                    style="border-radius:10px;padding:10px 14px;">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Security Question <span class="text-danger">*</span></label>
+                  <select class="form-select" id="securityQuestion" required style="border-radius:10px;padding:10px 14px;">
+                    <option value="">— Select a question —</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                    <option value="What city were you born in?">What city were you born in?</option>
+                    <option value="What is your favourite food?">What is your favourite food?</option>
+                    <option value="What was your first school's name?">What was your first school's name?</option>
+                    <option value="Who was your favourite teacher?">Who was your favourite teacher?</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Security Answer <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="securityAnswer" required placeholder="Your answer (stored in UPPERCASE)"
+                    style="border-radius:10px;padding:10px 14px;">
+                  <div class="form-text">Answer is stored in uppercase — type freely, casing doesn't matter.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius:10px;">
+                  <i class="fas fa-arrow-right me-2"></i>Save & Continue to Document Upload
+                </button>
+              </form>
+            </div>
+
+            <!-- ─── STEP 4: Qualification Info ───────────── -->
+            <div class="registration-step" id="step4">
+              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-graduation-cap text-primary me-2"></i>Step 4: Qualification Information</h6>
+              <p class="text-muted small mb-4">Tell us about your highest academic qualification and any prior experience in the course you applied for.</p>
+              <form id="documentForm" novalidate>
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Highest Qualification <span class="text-danger">*</span></label>
+                  <select class="form-select" id="highestQualification" required style="border-radius:10px;padding:10px 14px;">
+                    <option value="">— Select your highest qualification —</option>
+                    <option value="WAEC/SSCE">WAEC / SSCE</option>
+                    <option value="NECO">NECO</option>
+                    <option value="OND">OND (Ordinary National Diploma)</option>
+                    <option value="HND">HND (Higher National Diploma)</option>
+                    <option value="BSc/BA">BSc / BA (Bachelor's Degree)</option>
+                    <option value="MSc/MA">MSc / MA (Master's Degree)</option>
+                    <option value="PhD">PhD / Doctorate</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <div class="form-text">Select the highest academic qualification you currently hold.</div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Do you have previous experience or training in the course you applied for? <span class="text-danger">*</span></label>
+                  <div class="d-flex gap-4 mt-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="prevExperience" id="prevExpYes" value="Yes" required>
+                      <label class="form-check-label fw-semibold" for="prevExpYes">
+                        <i class="fas fa-check-circle text-success me-1"></i>Yes
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="prevExperience" id="prevExpNo" value="No" required>
+                      <label class="form-check-label fw-semibold" for="prevExpNo">
+                        <i class="fas fa-times-circle text-muted me-1"></i>No
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-text">This helps us better understand your background — it does not affect your admission.</div>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg w-100 py-2" style="border-radius:10px;">
+                  <i class="fas fa-check me-2"></i>Complete Registration
+                </button>
+              </form>
+            </div>
+
+          </div><!-- /p-4 -->
+        </div><!-- /reg-card -->
+
+      </div>
     </div>
+  </div>
 
-   <!-- Success Modal -->
-    <div class="modal fade" id="registrationSuccessModal" tabindex="-1" aria-labelledby="registrationSuccessModalLabel">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="registrationSuccessModalLabel"><i class="fas fa-graduation-cap me-2"></i>Registration Complete!</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-certificate fa-4x text-success mb-3"></i>
-                        <h4>Congratulations! Your registration is complete.</h4>
-                        <div class="admission-details p-3 bg-light rounded">
-                            <p id="admissionNumberSpan"></p>
-                            <p class="text-muted">This is your new username for login</p>
-                        </div>
-                    </div>
-                    <!-- Alert Box inside modal -->
-                    <div id="modalAlertBox"></div>
-                    
-                    <div class="d-grid gap-2">
-                        <button id="downloadAdmissionLetterBtn" class="btn btn-success" aria-label="Download Admission Letter">
-                            <i class="fas fa-download me-2"></i>Download Admission Letter
-                        </button>
-                        <button id="downloadReceiptBtn" class="btn btn-primary" aria-label="Download Payment Receipt">
-                            <i class="fas fa-receipt me-2"></i>Download Payment Receipt
-                        </button>
-                        <a href="/student/login" class="btn btn-outline-primary" aria-label="Login to Student Dashboard">
-                            Login to Student Dashboard
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <!-- Success Modal -->
+  <div class="modal fade" id="registrationSuccessModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+        <div class="modal-header" style="background:linear-gradient(135deg,#059669,#10B981);border:none;">
+          <h5 class="modal-title text-white fw-bold"><i class="fas fa-graduation-cap me-2"></i>Registration Complete!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-    </div>
-
-
-    <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title" id="paymentModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Application Payment Required</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Please complete the application fee payment of ₦100 to proceed with registration.</p>
-                    <form id="applicationForm" novalidate>
-                        <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-custom" id="firstName" required aria-label="First Name" aria-describedby="firstNameHelp">
-                            <div id="firstNameHelp" class="form-text">Enter your first name.</div>
-                            <div class="invalid-feedback">Please enter your first name.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-custom" id="lastName" required aria-label="Last Name" aria-describedby="lastNameHelp">
-                            <div id="lastNameHelp" class="form-text">Enter your last name.</div>
-                            <div class="invalid-feedback">Please enter your last name.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control form-control-custom" id="email" required aria-label="Email Address" aria-describedby="emailHelp">
-                            <div id="emailHelp" class="form-text">Enter a valid email address for payment confirmation.</div>
-                            <div class="invalid-feedback">Please enter a valid email address.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control form-control-custom" id="phone" aria-label="Phone Number" aria-describedby="phoneHelp">
-                            <div id="phoneHelp" class="form-text">Enter your phone number (optional).</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-select form-control-custom" id="gender" aria-label="Select Gender" aria-describedby="genderHelp">
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div id="genderHelp" class="form-text">Select your gender (optional).</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control form-control-custom" id="dateOfBirth" aria-label="Date of Birth" aria-describedby="dateOfBirthHelp">
-                            <div id="dateOfBirthHelp" class="form-text">Enter your date of birth (optional).</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <input type="text" class="form-control form-control-custom" id="address" aria-label="Address" aria-describedby="addressHelp">
-                            <div id="addressHelp" class="form-text">Enter your address (optional).</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="courseId" class="form-label">Course <span class="text-danger">*</span></label>
-                            <select class="form-select form-control-custom" id="courseId" required aria-label="Select Course" aria-describedby="courseIdHelp">
-                                <option value="">Select a course</option>
-                                <option value="1">Web Development</option>
-                                <option value="2">Data Science</option>
-                                <option value="3">Cybersecurity</option>
-                            </select>
-                            <div id="courseIdHelp" class="form-text">Choose the course you are applying for.</div>
-                            <div class="invalid-feedback">Please select a course.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="schedule" class="form-label">Schedule</label>
-                            <select class="form-select form-control-custom" id="schedule" aria-label="Select Schedule" aria-describedby="scheduleHelp">
-                                <option value="">Select a schedule</option>
-                                <option value="Full-Time">Full-Time</option>
-                                <option value="Part-Time">Part-Time</option>
-                                <option value="Online">Online</option>
-                            </select>
-                            <div id="scheduleHelp" class="form-text">Choose your preferred schedule (optional).</div>
-                        </div>
-                    </form>
-                    <div class="d-grid">
-                        <button class="btn btn-primary" id="payNowButton" aria-label="Pay Now">
-                            <i class="fas fa-credit-card me-2"></i>Pay Now
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="modal-body text-center p-4">
+          <i class="fas fa-certificate fa-4x text-success mb-3"></i>
+          <h4 class="fw-bold">Congratulations!</h4>
+          <p class="text-muted">Your registration has been completed successfully.</p>
+          <div class="bg-light rounded-3 p-3 mb-4">
+            <p id="admissionNumberSpan" class="fw-bold text-primary fs-5 mb-1"></p>
+            <p class="text-muted small mb-0">Use this as your username and initial password to log in to the Student Portal</p>
+          </div>
+          <div id="modalAlertBox"></div>
+          <div class="d-grid gap-2">
+            <button id="downloadAdmissionLetterBtn" class="btn btn-success">
+              <i class="fas fa-download me-2"></i>Download Admission Letter
+            </button>
+            <button id="downloadReceiptBtn" class="btn btn-primary">
+              <i class="fas fa-receipt me-2"></i>Download Payment Receipt
+            </button>
+            <a href="/student/login" class="btn btn-outline-primary">
+              <i class="fas fa-sign-in-alt me-2"></i>Login to Student Portal
+            </a>
+          </div>
         </div>
+      </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="/registration.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="/registration.js"></script>
 </body>
 </html>

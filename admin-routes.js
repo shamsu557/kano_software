@@ -51,12 +51,14 @@ router.get('/overview', isAdmin, (req, res) => {
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE status NOT IN ("Applied")', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM staff WHERE is_registered=1', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM courses', (e, rows) => r(rows[0]?.c || 0))),
+    new Promise(r => db.query('SELECT COUNT(*) as c FROM courses WHERE is_active=1', (e, rows) => r(rows[0]?.c || 0))),
+    new Promise(r => db.query('SELECT COUNT(*) as c FROM courses WHERE is_active=0', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE graduation_status="Passed" AND graduation_approved_by IS NULL', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE graduation_status="Failed" AND status != "Active"', (e, rows) => r(rows[0]?.c || 0))),
     new Promise(r => db.query('SELECT COUNT(*) as c FROM students WHERE status="Active"', (e, rows) => r(rows[0]?.c || 0))),
   ];
-  Promise.all(queries).then(([students, staff, courses, pendingGrad, failed, activeStudents]) => {
-    res.json({ success: true, students, staff, courses, pendingGrad, failed, activeStudents });
+  Promise.all(queries).then(([students, staff, courses, activeCourses, inactiveCourses, pendingGrad, failed, activeStudents]) => {
+    res.json({ success: true, students, staff, courses, activeCourses, inactiveCourses, pendingGrad, failed, activeStudents });
   });
 });
 
@@ -864,5 +866,27 @@ function generateIdCard(res, entity, type) {
   doc.fontSize(6).fillColor('#888888').text(`Issued: ${new Date().toLocaleDateString()}`, 10, 300);
   doc.end();
 }
+
+
+
+// ── TRACK APPLICATION (by email or phone) ──────────────────────────────────────
+router.get('/track-application', isAdmin, (req, res) => {
+  const { search } = req.query;
+  if (!search) return res.status(400).json({ error: 'Email or phone required' });
+  db.query(
+    `SELECT s.id, s.first_name, s.last_name, s.email, s.phone,
+            s.admission_number, s.application_number, s.status,
+            c.name as course_name
+     FROM students s
+     LEFT JOIN courses c ON c.id = s.course_id
+     WHERE s.email = ? OR s.phone = ?
+     LIMIT 1`,
+    [search, search],
+    (err, rows) => {
+      if (err || !rows.length) return res.status(404).json({ error: 'No record found' });
+      res.json({ success: true, student: rows[0] });
+    }
+  );
+});
 
 module.exports = router;
