@@ -326,8 +326,156 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Space Grotesk', sans-serif; }
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
-/* ── Course card builder (mirrors homepage style) ── */
-let _allCourses = [];
+let _allCourses  = [];
+let _paystackKey = '';
+let _courseData  = {};
+
+(async () => {
+    try {
+        const r = await fetch('/api/config/paystack-key');
+        const d = await r.json();
+        _paystackKey = d.key || '';
+    } catch(e) { console.warn('Could not fetch Paystack key'); }
+})();
+
+// Terms checkbox enables/disables submit button
+// Script is at bottom of body — DOM already ready, no DOMContentLoaded wrapper needed
+const agreeBox  = document.getElementById('agreeTerms');
+const submitBtn = document.getElementById('submitBtn');
+
+function toggleSubmit() {
+    if (submitBtn) submitBtn.disabled = !agreeBox.checked;
+}
+if (agreeBox) agreeBox.addEventListener('change', toggleSubmit);
+toggleSubmit(); // initial state: disabled until checked
+
+// Accept in terms modal also ticks the checkbox
+document.getElementById('acceptTerms')?.addEventListener('click', function () {
+    if (agreeBox) agreeBox.checked = true;
+    toggleSubmit();
+    bootstrap.Modal.getInstance(document.getElementById('termsModal'))?.hide();
+});
+
+// Application form submit
+document.getElementById('applicationForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const courseId = document.getElementById('courseId').value;
+        if (!courseId) { showAppMessage('Please select a course first.', 'danger'); return; }
+
+        // Re-fetch the Paystack key now if not already loaded (async race on page load)
+        if (!_paystackKey) {
+            try {
+                const kr = await fetch('/api/config/paystack-key');
+                const kd = await kr.json();
+                _paystackKey = kd.key || '';
+            } catch(e) { /* ignore */ }
+        }
+        if (!_paystackKey) {
+            showAppMessage('Payment gateway not configured. Please contact support.', 'danger');
+            return;
+        }
+
+        const firstName   = document.getElementById('firstName').value.trim();
+        const lastName    = document.getElementById('lastName').value.trim();
+        const email       = document.getElementById('email').value.trim();
+        const phone       = document.getElementById('phone').value.trim();
+        const gender      = document.getElementById('gender').value;
+        const dateOfBirth = document.getElementById('dateOfBirth').value;
+        const address     = document.getElementById('address').value.trim();
+        const schedule    = document.getElementById('schedule').value;
+        const sessionTimeSel = document.getElementById('sessionTime');
+        const sessionTime = sessionTimeSel ? sessionTimeSel.value : '';
+        const picFile     = document.getElementById('profilePicture').files[0];
+
+        if (!firstName || !lastName || !email || !phone || !gender || !dateOfBirth || !address) {
+            showAppMessage('Please fill in all required fields.', 'danger'); return;
+        }
+        if (!picFile) { showAppMessage('Please upload a profile picture.', 'danger'); return; }
+
+        const btn = submitBtn;
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting…';
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('firstName',   firstName);
+            formData.append('lastName',    lastName);
+            formData.append('email',       email);
+            formData.append('phone',       phone);
+            formData.append('gender',      gender);
+            formData.append('dateOfBirth', dateOfBirth);
+            formData.append('address',     address);
+            formData.append('courseId',    courseId);
+            formData.append('schedule',    schedule);
+            if (sessionTime) formData.append('sessionTime', sessionTime);
+            formData.append('profilePicture', picFile);
+
+            const res    = await fetch('/api/student/apply', { method: 'POST', body: formData });
+            const result = await res.json();
+            if (!result.success) throw new Error(result.error || 'Failed to submit application');
+
+            const appNumber = result.applicationNumber;
+            const appFee    = _courseData.appFee || 0;
+            const amountKobo = Math.round(appFee * 100);
+
+            if (amountKobo <= 0) {
+                // Free application — skip payment
+                await verifyAppPayment('FREE-' + Date.now(), appNumber);
+                return;
+            }
+
+            const handler = PaystackPop.setup({
+                key:      _paystackKey,
+                email,
+                amount:   amountKobo,
+                currency: 'NGN',
+                ref:      'APP-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase(),
+                metadata: { application_number: appNumber, first_name: firstName, last_name: lastName, course_id: courseId },
+                callback: (response) => verifyAppPayment(response.reference, appNumber),
+                onClose:  () => showAppMessage('Payment cancelled. Your application has been saved — use your Application Number to resume.', 'warning'),
+            });
+            handler.openIframe();
+        } catch(err) {
+            showAppMessage(err.message || 'Application failed. Please try again.', 'danger');
+            btn.innerHTML = origHtml;
+            btn.disabled  = false;
+        }
+});
+
+async function verifyAppPayment(reference, appNumber) {
+    try {
+        const res    = await fetch('/api/payment/verify-application', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ reference, applicationNumber: appNumber }),
+        });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error || 'Payment verification failed');
+
+        const num = result.applicationNumber || appNumber;
+        document.getElementById('applicationNumber').textContent = num;
+        sessionStorage.setItem('applicationNumber', num);
+        new bootstrap.Modal(document.getElementById('successModal')).show();
+    } catch(err) {
+        showAppMessage('Payment verification failed. If you were charged, contact support with reference: ' + reference, 'danger');
+    }
+}
+
+function showAppMessage(msg, type = 'danger') {
+    const box = document.getElementById('appMessage');
+    if (!box) return;
+    box.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function downloadReceipt() {
+    const num = sessionStorage.getItem('applicationNumber');
+    if (num) window.open(`/api/download/application-form/${encodeURIComponent(num)}`, '_blank');
+    else showAppMessage('Application number not found. Please check your email.', 'danger');
+}
 
 function escHtml(s) {
     if (typeof s !== 'string') return s ?? '';
@@ -495,7 +643,5 @@ function changeCourse() {
     window.scrollTo({ top: document.getElementById('coursesContainer').offsetTop - 80, behavior: 'smooth' });
 }
     </script>
-    <script src="/main.js"></script>
-    <script src="/application.js"></script>
 </body>
 </html>

@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Bind forms
   document.getElementById('verifyApplicationForm').addEventListener('submit', verifyApplication);
-  document.getElementById('securityForm').addEventListener('submit', setupSecurity);
   document.getElementById('documentForm').addEventListener('submit', completeRegistration);
   document.getElementById('downloadAdmissionLetterBtn')?.addEventListener('click', downloadAdmissionLetter);
   document.getElementById('downloadReceiptBtn')?.addEventListener('click', downloadReceipt);
@@ -68,17 +67,16 @@ function showStep(n) {
 
   // Progress pills
   const titles = {
-    1: ['Verify Your Number',           'Enter your Application or Admission Number'],
-    2: ['Registration Fee Payment',      'Select and complete your payment'],
-    3: ['Password & Security Setup',     'Set your portal password and security question'],
-    4: ['Qualification Information',    'Tell us about your highest qualification and experience'],
+    1: ['Verify Your Number',        'Enter your Application or Admission Number'],
+    2: ['Registration Fee Payment',  'Select and complete your payment'],
+    3: ['Qualification Information', 'Tell us about your highest qualification and experience'],
   };
   const [title, sub] = titles[n] || ['Registration', ''];
   document.getElementById('stepTitle').textContent    = title;
   document.getElementById('stepSubtitle').textContent = sub;
 
   // Progress step indicators
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const ps = document.getElementById(`ps${i}`);
     if (!ps) continue;
     ps.classList.remove('active', 'done');
@@ -268,8 +266,21 @@ async function processPayment() {
 
   const appNum = studentData.application_number || studentData.admission_number;
 
+  // Re-fetch key now if not loaded yet (async race on page load)
+  if (!PAYSTACK_KEY) {
+    try {
+      const kr = await fetch('/api/config/paystack-key');
+      const kd = await kr.json();
+      PAYSTACK_KEY = kd.key || '';
+    } catch(e) { /* ignore */ }
+  }
+  if (!PAYSTACK_KEY) {
+    showAlert('Payment gateway not configured. Please contact support.', 'danger');
+    return;
+  }
+
   const handler = PaystackPop.setup({
-    key:      'pk_live_661e479efe8cccc078d6e6c078a5b6e0dc963079',
+    key:      PAYSTACK_KEY,
     email:    studentData.email,
     amount:   Math.round(amount * 100),
     currency: 'NGN',
@@ -320,10 +331,10 @@ async function verifyRegistrationPayment(reference, installmentType) {
     if (installmentType === 'second') {
       showAlert('✅ Final installment paid! Your registration payment is now complete. Please download your receipt.', 'success');
     } else if (installmentType === 'full') {
-      showAlert('✅ Full payment received! Proceed to set up your security details.', 'success');
+      showAlert('✅ Full payment received! Please fill in your qualification details to complete registration.', 'success');
       setTimeout(() => showStep(3), 1800);
     } else {
-      showAlert('✅ First installment paid! Proceed to set up your security details. You can pay the balance anytime.', 'success');
+      showAlert('✅ First installment paid! Please fill in your qualification details to complete registration. You can pay the balance anytime.', 'success');
       setTimeout(() => showStep(3), 1800);
     }
   } catch(err) {
@@ -333,65 +344,6 @@ async function verifyRegistrationPayment(reference, installmentType) {
   }
 }
 
-/* ── STEP 3 — Security Setup ─────────────────────────── */
-async function setupSecurity(e) {
-  e.preventDefault();
-  if (!studentData?.id) { showAlert('Student data missing. Please go back and verify your number.', 'danger'); return; }
-
-  if (studentData.hasPassword && !studentData.is_first_login) {
-    showAlert('Security already set up. Proceeding to document upload.', 'info');
-    showStep(4);
-    return;
-  }
-
-  const password        = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  const question        = document.getElementById('securityQuestion').value;
-  const answer          = document.getElementById('securityAnswer').value.trim();
-
-  if (!password || !confirmPassword || !question || !answer) {
-    showAlert('Please fill in all fields.', 'danger'); return;
-  }
-  if (password !== confirmPassword) {
-    document.getElementById('confirmPassword').classList.add('is-invalid');
-    showAlert('Passwords do not match.', 'danger'); return;
-  }
-  document.getElementById('confirmPassword').classList.remove('is-invalid');
-
-  if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-    showAlert('Password must be at least 8 characters and contain both letters and numbers.', 'danger'); return;
-  }
-  if (answer.length < 2) {
-    showAlert('Security answer must be at least 2 characters.', 'danger'); return;
-  }
-
-  const btn = e.target.querySelector('button[type="submit"]');
-  setLoading(btn, true);
-
-  try {
-    const res = await fetch('/api/student/setup-security', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        studentId:       studentData.id,
-        password,
-        securityQuestion: question,
-        securityAnswer:  answer,          // server trims + uppercases
-      }),
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Setup failed');
-
-    studentData.hasPassword    = true;
-    studentData.is_first_login = 0;
-    showAlert('✅ Security details saved!', 'success');
-    setTimeout(() => showStep(4), 1000);
-  } catch(err) {
-    showAlert('Error: ' + err.message, 'danger');
-  } finally {
-    setLoading(btn, false);
-  }
-}
 
 /* ── STEP 4 — Qualification info ──────────────────────── */
 async function completeRegistration(e) {
@@ -426,7 +378,7 @@ async function completeRegistration(e) {
 
     // Show success modal
     const span = document.getElementById('admissionNumberSpan');
-    if (span) span.textContent = `Admission Number: ${admNum || 'Will be sent via email'}`;
+    if (span) span.textContent = `Your Admission Number: ${admNum || '—'}`;
     bsModal('registrationSuccessModal').show();
   } catch(err) {
     showAlert('Error: ' + err.message, 'danger');

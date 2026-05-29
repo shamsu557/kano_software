@@ -210,7 +210,8 @@ CREATE TABLE students (
 
     login_blocked TINYINT(1) DEFAULT 0,
     block_reason TEXT,
-
+  highest_qualification VARCHAR(100) DEFAULT NULL,
+  COLUMN previous_experience VARCHAR(10) DEFAULT NULL;
     graduation_status VARCHAR(50) DEFAULT 'Pending',
     graduation_score DECIMAL(5,2) DEFAULT 0.00,
 

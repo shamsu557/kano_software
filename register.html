@@ -82,10 +82,6 @@
               </div>
               <div class="ps-item" id="ps3">
                 <div class="ps-num">3</div>
-                <div class="ps-label">Security</div>
-              </div>
-              <div class="ps-item" id="ps4">
-                <div class="ps-num">4</div>
                 <div class="ps-label">Qualifications</div>
               </div>
             </div>
@@ -156,54 +152,15 @@
                 <a id="receiptDownloadLink" href="#" target="_blank" class="btn btn-outline-success btn-sm me-2">
                   <i class="fas fa-download me-1"></i>Download Receipt
                 </a>
-                <button class="btn btn-primary btn-sm" onclick="showStep(3)">
-                  Continue to Security Setup <i class="fas fa-arrow-right ms-1"></i>
+                <button class="btn btn-primary btn-sm" onclick="showStep(3)" style="border-radius:10px;">
+                  Continue to Qualifications <i class="fas fa-arrow-right ms-1"></i>
                 </button>
               </div>
             </div>
 
-            <!-- ─── STEP 3: Security ──────────────────────── -->
+            <!-- ─── STEP 3: Qualification Info ───────────── -->
             <div class="registration-step" id="step3">
-              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-shield-alt text-primary me-2"></i>Step 3: Set Up Your Password & Security Question</h6>
-              <p class="text-muted small mb-4">Your <strong>Admission Number</strong> is your initial username. Set a new password and a security question — the answer will be stored in UPPERCASE and used if you ever forget your password.</p>
-              <form id="securityForm" novalidate>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">New Password <span class="text-danger">*</span></label>
-                  <input type="password" class="form-control" id="password" required placeholder="Min 8 chars, letters and numbers"
-                    style="border-radius:10px;padding:10px 14px;">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
-                  <input type="password" class="form-control" id="confirmPassword" required placeholder="Re-enter password"
-                    style="border-radius:10px;padding:10px 14px;">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Security Question <span class="text-danger">*</span></label>
-                  <select class="form-select" id="securityQuestion" required style="border-radius:10px;padding:10px 14px;">
-                    <option value="">— Select a question —</option>
-                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
-                    <option value="What city were you born in?">What city were you born in?</option>
-                    <option value="What is your favourite food?">What is your favourite food?</option>
-                    <option value="What was your first school's name?">What was your first school's name?</option>
-                    <option value="Who was your favourite teacher?">Who was your favourite teacher?</option>
-                  </select>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label fw-semibold">Security Answer <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="securityAnswer" required placeholder="Your answer (stored in UPPERCASE)"
-                    style="border-radius:10px;padding:10px 14px;">
-                  <div class="form-text">Answer is stored in uppercase — type freely, casing doesn't matter.</div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius:10px;">
-                  <i class="fas fa-arrow-right me-2"></i>Save & Continue to Document Upload
-                </button>
-              </form>
-            </div>
-
-            <!-- ─── STEP 4: Qualification Info ───────────── -->
-            <div class="registration-step" id="step4">
-              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-graduation-cap text-primary me-2"></i>Step 4: Qualification Information</h6>
+              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-graduation-cap text-primary me-2"></i>Step 3: Qualification Information</h6>
               <p class="text-muted small mb-4">Tell us about your highest academic qualification and any prior experience in the course you applied for.</p>
               <form id="documentForm" novalidate>
                 <div class="mb-4">
@@ -266,7 +223,7 @@
           <p class="text-muted">Your registration has been completed successfully.</p>
           <div class="bg-light rounded-3 p-3 mb-4">
             <p id="admissionNumberSpan" class="fw-bold text-primary fs-5 mb-1"></p>
-            <p class="text-muted small mb-0">Use this as your username and initial password to log in to the Student Portal</p>
+            <p class="text-muted small mb-0">Use your <strong>Admission Number as both your username and password</strong> to log in. You will be prompted to set a new password and security question on first login.</p>
           </div>
           <div id="modalAlertBox"></div>
           <div class="d-grid gap-2">
