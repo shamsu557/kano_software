@@ -11,6 +11,12 @@ let _paystackKey = '';
 let _courseData  = {};   // current selected course details
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // student_signup.html uses a hidden input for courseId (not a <select>)
+  // and has its own fully self-contained inline script.
+  // Skip all application.js setup on that page to avoid conflicts.
+  const courseEl = document.getElementById('courseId');
+  if (!courseEl || courseEl.tagName !== 'SELECT') return;
+
   // Fetch Paystack public key
   try {
     const r = await fetch('/api/config/paystack-key');
@@ -339,8 +345,13 @@ function initializeApplicationPayment(applicationNumber, applicationData) {
     return;
   }
 
+  if (!_paystackKey) {
+    showMessage('Payment configuration not loaded. Please refresh the page and try again.', 'danger');
+    return;
+  }
+
   const handler = PaystackPop.setup({
-    key:      'pk_live_661e479efe8cccc078d6e6c078a5b6e0dc963079',
+    key:      _paystackKey,
     email:    applicationData.email,
     amount:   amountKobo,
     currency: 'NGN',
